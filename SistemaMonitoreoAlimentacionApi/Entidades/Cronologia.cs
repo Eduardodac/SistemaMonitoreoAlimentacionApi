@@ -1,6 +1,6 @@
 ﻿namespace SistemaMonitoreoAlimentacionApi.Entidades
 {
-    public class Cronología
+    public class Cronologia
     {
         public Guid CronologiaId { get; set; } = Guid.Empty!;
         public Guid UsuarioId { get; set; } = Guid.Empty!;

@@ -2,7 +2,7 @@
 {
     public class Gato
     {
-        public Guid GatosId { get; set; } = Guid.Empty!;
+        public Guid GatoId { get; set; } = Guid.Empty!;
         public Guid UsuarioId { get; set; } = Guid.Empty!;
         public string Nombre { get; set; } = null!;
         public string Raza { get; set; } = null!;

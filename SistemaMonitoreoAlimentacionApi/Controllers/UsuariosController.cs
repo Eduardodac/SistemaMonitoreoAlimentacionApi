@@ -15,13 +15,13 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Usuarios>> GetUsuarios()
+        public ActionResult<List<Usuario>> GetUsuarios()
         {
-            return new List<Usuarios>();
+            return new List<Usuario>();
         }
 
         [HttpPost]
-        public async Task<ActionResult> PostUsuario(Usuarios usuario)
+        public async Task<ActionResult> PostUsuario(Usuario usuario)
         {
             _context.Add(usuario);
             await _context.SaveChangesAsync();
