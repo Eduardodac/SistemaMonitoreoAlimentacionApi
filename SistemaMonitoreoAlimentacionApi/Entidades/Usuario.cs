@@ -1,6 +1,6 @@
 ﻿namespace SistemaMonitoreoAlimentacionApi.Entidades
 {
-    public class Usuarios
+    public class Usuario
     {
         public Guid UsuarioId { get; set; } = Guid.Empty!;
         public string Nombre { get; set; } = null!;

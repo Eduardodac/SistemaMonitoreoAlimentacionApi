@@ -1,6 +1,6 @@
 ﻿namespace SistemaMonitoreoAlimentacionApi.Entidades
 {
-    public class Horarios
+    public class Horario
     {
         public Guid HorarioId { get; set; } = Guid.Empty!;
         public Guid UsuarioId { get; set; } = Guid.Empty!;

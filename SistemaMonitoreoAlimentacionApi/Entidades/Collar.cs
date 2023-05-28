@@ -1,6 +1,6 @@
 ﻿namespace SistemaMonitoreoAlimentacionApi.Entidades
 {
-    public class Collares
+    public class Collar
     {
         public Guid CollarId { get; set; } = Guid.Empty!;
         public string Salida { get; set; } = null!;
