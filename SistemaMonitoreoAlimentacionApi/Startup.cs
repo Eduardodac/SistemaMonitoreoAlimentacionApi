@@ -20,6 +20,14 @@ namespace SistemaMonitoreoAlimentacionApi
 
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
+
+            services.AddCors(opciones =>
+            {
+                opciones.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -33,6 +41,8 @@ namespace SistemaMonitoreoAlimentacionApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthorization();
 
