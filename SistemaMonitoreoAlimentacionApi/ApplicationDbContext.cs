@@ -16,10 +16,9 @@ namespace SistemaMonitoreoAlimentacionApi
         public DbSet<Collar> Collares { get; set; }
         public DbSet<Cronologia> Cronologias { get; set; }
         public DbSet<Evento> Eventos { get; set; }
-        public DbSet<Calendario> Calendarios { get; set; }
         public DbSet<Horario> Horarios { get; set; }
         public DbSet<Aviso> Avisos { get; set; }
-
+        public DbSet<DiadelaSemana> DiadelaSemana { get; set; }
 
 
     }

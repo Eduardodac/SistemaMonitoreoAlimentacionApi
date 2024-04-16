@@ -1,10 +1,15 @@
-﻿namespace SistemaMonitoreoAlimentacionApi.Entidades
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SistemaMonitoreoAlimentacionApi.Entidades
 {
     public class Gato
     {
         public Guid GatoId { get; set; } = Guid.Empty!;
+        [Required]
         public Guid UsuarioId { get; set; } = Guid.Empty!;
+        [Required]
         public Guid CollaId { get;set; } = Guid.Empty!;
+        [Required]
         public string Nombre { get; set; } = null!;
         public string? Raza { get; set; }
         public string? Sexo { get; set; }
