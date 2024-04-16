@@ -16,6 +16,7 @@ namespace SistemaMonitoreoAlimentacionApi.Entidades
         public string Password { get; set; } = null!;
         public string? ImagenUsuario { get; set; }
         public Guid? DosificadorId { get; set; }
+        public Dosificador? Dosificador { get; set; }
 
     }
 }

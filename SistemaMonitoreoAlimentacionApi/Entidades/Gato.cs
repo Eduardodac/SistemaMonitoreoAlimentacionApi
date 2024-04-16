@@ -15,5 +15,7 @@ namespace SistemaMonitoreoAlimentacionApi.Entidades
         public string? Sexo { get; set; }
         public string? Edad { get; set; }
         public string? ImagenGato { get; set; }
+        public Usuario? Usuario { get; set; }
+        public Collar? Collar { get; set; }
     }
 }

@@ -9,5 +9,6 @@ namespace SistemaMonitoreoAlimentacionApi.Entidades
         [Required]
         public Guid UsuarioId { get; set; } = Guid.Empty!;
         public DateTime Hora { get; set; } = DateTime.Now;
+        public Usuario? Usuario { get; set;}
     }
 }

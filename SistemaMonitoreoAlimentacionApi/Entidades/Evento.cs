@@ -15,5 +15,8 @@ namespace SistemaMonitoreoAlimentacionApi.Entidades
         public double Consumo { get; set; } = 0.0;
         [Required]
         public DateTime Hora { get; set; } = DateTime.Now!;
+        public Boolean IntegradoAnalisis { get; set; } = false;
+        public Dosificador? Dosificador { get; set; }
+        public Gato? Gato { get; set; }
     }
 }
