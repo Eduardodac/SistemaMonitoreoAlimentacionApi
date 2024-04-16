@@ -7,7 +7,7 @@
         public string ApellidoPaterno { get; set; } = null!;
         public string ApellidoMaterno { get; set; } = null!;
         public string UsuariosCorreo { get; set; } = null!;
-        public string? Password { get; set; }
+        public string Password { get; set; } = null!;
         public string? ImagenUsuario { get; set; }
         public Guid? DosificadorId { get; set; }
 
