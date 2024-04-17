@@ -10,5 +10,6 @@ namespace SistemaMonitoreoAlimentacionApi.Entidades
         public Guid UsuarioId { get; set; } = Guid.Empty!;
         public DateTime Hora { get; set; } = DateTime.Now;
         public Usuario? Usuario { get; set;}
+        public DiadelaSemana? DiadelaSemana { get; set; }
     }
 }

@@ -9,6 +9,15 @@ namespace SistemaMonitoreoAlimentacionApi
         {
 
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Dosificador>()
+                .HasOne(u => u.Usuario)
+                .WithOne(d => d.Dosificador)
+                .HasForeignKey<Usuario>(u => u.DosificadorId);
+
+            base.OnModelCreating(modelBuilder);
+        }
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Dosificador> Dosificadores { get; set; }

@@ -15,4 +15,16 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dtos\Aviso\" />
+    <Folder Include="Dtos\Collar\" />
+    <Folder Include="Dtos\Cronologia\" />
+    <Folder Include="Dtos\DiadelaSemana\" />
+    <Folder Include="Dtos\Dosificador\" />
+    <Folder Include="Dtos\Evento\" />
+    <Folder Include="Dtos\Gato\" />
+    <Folder Include="Dtos\Horario\" />
+    <Folder Include="Dtos\Usuario\" />
+  </ItemGroup>
+
 </Project>

@@ -10,6 +10,6 @@ namespace SistemaMonitoreoAlimentacionApi.Entidades
         public string NumeroRegistro { get; set; } = null!;
         [Required]
         public Boolean EstatusActivacion { get; set; } = false;
-
+        public Usuario? Usuario { get; set; }
     }
 }

@@ -42,42 +42,9 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
 
                     b.HasKey("AvisoId");
 
+                    b.HasIndex("UsuarioId");
+
                     b.ToTable("Avisos");
-                });
-
-            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Calendario", b =>
-                {
-                    b.Property<Guid>("CalendarioId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("HorarioDomingoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("HorarioJuevesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("HorarioLunesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("HorarioMartesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("HorarioMiercolesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("HorarioSabadoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("HorarioViernesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UsuarioId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("CalendarioId");
-
-                    b.ToTable("Calendarios");
                 });
 
             modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Collar", b =>
@@ -90,11 +57,10 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Registro")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("FechaSalida")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Salida")
+                    b.Property<string>("NumeroRegistro")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -109,18 +75,46 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("EventoId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<double>("AlimentoConsumido")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Aproximaciones")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AproximacionesSinConsumo")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaFin")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaInicio")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("GatoId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UsuarioId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("CronologiaId");
 
+                    b.HasIndex("GatoId");
+
                     b.ToTable("Cronologias");
+                });
+
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.DiadelaSemana", b =>
+                {
+                    b.Property<int>("DiadelaSemanaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DiadelaSemanaId"), 1L, 1);
+
+                    b.Property<string>("Dia")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DiadelaSemanaId");
+
+                    b.ToTable("DiadelaSemana");
                 });
 
             modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Dosificador", b =>
@@ -132,12 +126,12 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     b.Property<bool>("EstatusActivacion")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Registro")
+                    b.Property<DateTime?>("FechaSalida")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NumeroRegistro")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("Salida")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("DosificadorId");
 
@@ -153,6 +147,9 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     b.Property<double>("Consumo")
                         .HasColumnType("float");
 
+                    b.Property<Guid?>("DosificadorId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("DosificicadorId")
                         .HasColumnType("uniqueidentifier");
 
@@ -165,7 +162,14 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     b.Property<DateTime>("Hora")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IntegradoAnalisis")
+                        .HasColumnType("bit");
+
                     b.HasKey("EventoId");
+
+                    b.HasIndex("DosificadorId");
+
+                    b.HasIndex("GatoId");
 
                     b.ToTable("Eventos");
                 });
@@ -176,16 +180,16 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Edad")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("CollaId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Genero")
-                        .IsRequired()
+                    b.Property<Guid?>("CollarId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Edad")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImagenGato")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nombre")
@@ -193,13 +197,19 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Raza")
-                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Sexo")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UsuarioId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("GatoId");
+
+                    b.HasIndex("CollarId");
+
+                    b.HasIndex("UsuarioId");
 
                     b.ToTable("Gatos");
                 });
@@ -210,82 +220,20 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("AM1")
-                        .HasColumnType("bit");
+                    b.Property<int>("DiaDeLaSemanaId")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("AM10")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("AM11")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("AM12")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("AM2")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("AM3")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("AM4")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("AM5")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("AM6")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("AM7")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("AM8")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("AM9")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PM1")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PM10")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PM11")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PM12")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PM2")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PM3")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PM4")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PM5")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PM6")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PM7")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PM8")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PM9")
-                        .HasColumnType("bit");
+                    b.Property<DateTime>("Hora")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("UsuarioId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("HorarioId");
+
+                    b.HasIndex("DiaDeLaSemanaId");
+
+                    b.HasIndex("UsuarioId");
 
                     b.ToTable("Horarios");
                 });
@@ -297,7 +245,6 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ApellidoMaterno")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ApellidoPaterno")
@@ -315,15 +262,109 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UsuariosCorreo")
+                    b.Property<string>("UsuarioCorreo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UsuarioId");
 
+                    b.HasIndex("DosificadorId")
+                        .IsUnique()
+                        .HasFilter("[DosificadorId] IS NOT NULL");
+
                     b.ToTable("Usuarios");
+                });
+
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Aviso", b =>
+                {
+                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Cronologia", b =>
+                {
+                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Gato", "Gato")
+                        .WithMany()
+                        .HasForeignKey("GatoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Gato");
+                });
+
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Evento", b =>
+                {
+                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Dosificador", "Dosificador")
+                        .WithMany()
+                        .HasForeignKey("DosificadorId");
+
+                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Gato", "Gato")
+                        .WithMany()
+                        .HasForeignKey("GatoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dosificador");
+
+                    b.Navigation("Gato");
+                });
+
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Gato", b =>
+                {
+                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Collar", "Collar")
+                        .WithMany()
+                        .HasForeignKey("CollarId");
+
+                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Collar");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Horario", b =>
+                {
+                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.DiadelaSemana", "DiadelaSemana")
+                        .WithMany()
+                        .HasForeignKey("DiaDeLaSemanaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DiadelaSemana");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Usuario", b =>
+                {
+                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Dosificador", "Dosificador")
+                        .WithOne("Usuario")
+                        .HasForeignKey("SistemaMonitoreoAlimentacionApi.Entidades.Usuario", "DosificadorId");
+
+                    b.Navigation("Dosificador");
+                });
+
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Dosificador", b =>
+                {
+                    b.Navigation("Usuario");
                 });
 #pragma warning restore 612, 618
         }
