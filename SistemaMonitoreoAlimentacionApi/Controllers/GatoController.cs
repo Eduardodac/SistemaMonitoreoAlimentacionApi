@@ -1,83 +1,41 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SistemaMonitoreoAlimentacionApi.Entidades;
 
 namespace SistemaMonitoreoAlimentacionApi.Controllers
 {
-    public class GatoController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class GatoController : ControllerBase
     {
-        // GET: GatoController
-        public ActionResult Index()
-        {
-            return View();
+        private readonly ApplicationDbContext _context;
+
+        public GatoController(ApplicationDbContext context) { 
+            this._context = context;
         }
 
-        // GET: GatoController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
+        #region Get
+        [HttpGet]
+        public async Task<ActionResult<List<Gato>>> GetGatos() 
+        { 
+            return await _context.Gatos.ToListAsync();
         }
 
-        // GET: GatoController/Create
-        public ActionResult Create()
+        [HttpGet("primero")]
+        public async Task<ActionResult<Gato>> GetGato([FromQuery] Guid Id)
         {
-            return View();
-        }
+            var gato =  await _context.Gatos.FirstOrDefaultAsync(x => x.GatoId == Id);
 
-        // POST: GatoController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
+            if(gato == null)
             {
-                return RedirectToAction(nameof(Index));
+                return new NotFoundResult();
             }
-            catch
-            {
-                return View();
-            }
+
+            return gato;
         }
 
-        // GET: GatoController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+        #endregion
 
-        // POST: GatoController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: GatoController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: GatoController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
     }
 }

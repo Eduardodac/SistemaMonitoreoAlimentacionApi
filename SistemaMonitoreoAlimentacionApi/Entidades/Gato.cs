@@ -8,7 +8,7 @@ namespace SistemaMonitoreoAlimentacionApi.Entidades
         [Required]
         public Guid UsuarioId { get; set; } = Guid.Empty!;
         [Required]
-        public Guid CollaId { get;set; } = Guid.Empty!;
+        public Guid CollarId { get;set; } = Guid.Empty!;
         [Required]
         public string Nombre { get; set; } = null!;
         public string? Raza { get; set; }

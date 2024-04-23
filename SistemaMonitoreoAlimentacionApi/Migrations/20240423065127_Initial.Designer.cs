@@ -12,7 +12,7 @@ using SistemaMonitoreoAlimentacionApi;
 namespace SistemaMonitoreoAlimentacionApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240416065954_Initial")]
+    [Migration("20240423065127_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -149,10 +149,7 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     b.Property<double>("Consumo")
                         .HasColumnType("float");
 
-                    b.Property<Guid?>("DosificadorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DosificicadorId")
+                    b.Property<Guid>("DosificadorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Duracion")
@@ -182,10 +179,7 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CollaId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CollarId")
+                    b.Property<Guid>("CollarId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Edad")
@@ -306,7 +300,9 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 {
                     b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Dosificador", "Dosificador")
                         .WithMany()
-                        .HasForeignKey("DosificadorId");
+                        .HasForeignKey("DosificadorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Gato", "Gato")
                         .WithMany()
@@ -323,7 +319,9 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 {
                     b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Collar", "Collar")
                         .WithMany()
-                        .HasForeignKey("CollarId");
+                        .HasForeignKey("CollarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Usuario", "Usuario")
                         .WithMany()

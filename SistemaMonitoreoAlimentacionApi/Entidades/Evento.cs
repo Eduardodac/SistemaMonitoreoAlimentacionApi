@@ -6,7 +6,7 @@ namespace SistemaMonitoreoAlimentacionApi.Entidades
     {
         public Guid EventoId { get; set; } = Guid.Empty!;
         [Required]
-        public Guid DosificicadorId { get; set; } = Guid.Empty!;
+        public Guid DosificadorId { get; set; } = Guid.Empty!;
         [Required]
         public Guid GatoId { get; set; } = Guid.Empty!;
         [Required]

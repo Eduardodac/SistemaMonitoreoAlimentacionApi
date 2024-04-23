@@ -100,13 +100,12 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 {
                     GatoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UsuarioId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CollaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CollarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Raza = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Sexo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Edad = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ImagenGato = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CollarId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    ImagenGato = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -115,7 +114,8 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         name: "FK_Gatos_Collares_CollarId",
                         column: x => x.CollarId,
                         principalTable: "Collares",
-                        principalColumn: "CollarId");
+                        principalColumn: "CollarId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Gatos_Usuarios_UsuarioId",
                         column: x => x.UsuarioId,
@@ -178,13 +178,12 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 columns: table => new
                 {
                     EventoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DosificicadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DosificadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     GatoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Duracion = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Consumo = table.Column<double>(type: "float", nullable: false),
                     Hora = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IntegradoAnalisis = table.Column<bool>(type: "bit", nullable: false),
-                    DosificadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    IntegradoAnalisis = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -193,7 +192,8 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         name: "FK_Eventos_Dosificadores_DosificadorId",
                         column: x => x.DosificadorId,
                         principalTable: "Dosificadores",
-                        principalColumn: "DosificadorId");
+                        principalColumn: "DosificadorId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Eventos_Gatos_GatoId",
                         column: x => x.GatoId,
