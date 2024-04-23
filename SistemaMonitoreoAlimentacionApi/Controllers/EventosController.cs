@@ -3,27 +3,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SistemaMonitoreoAlimentacionApi.Controllers
 {
-    public class HorarioController : Controller
+    public class EventosController : Controller
     {
-        // GET: HorarioController
+        // GET: EventoController
         public ActionResult Index()
         {
             return View();
         }
 
-        // GET: HorarioController/Details/5
+        // GET: EventoController/Details/5
         public ActionResult Details(int id)
         {
             return View();
         }
 
-        // GET: HorarioController/Create
+        // GET: EventoController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: HorarioController/Create
+        // POST: EventoController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(IFormCollection collection)
@@ -38,13 +38,13 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             }
         }
 
-        // GET: HorarioController/Edit/5
+        // GET: EventoController/Edit/5
         public ActionResult Edit(int id)
         {
             return View();
         }
 
-        // POST: HorarioController/Edit/5
+        // POST: EventoController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -59,13 +59,13 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             }
         }
 
-        // GET: HorarioController/Delete/5
+        // GET: EventoController/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: HorarioController/Delete/5
+        // POST: EventoController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)

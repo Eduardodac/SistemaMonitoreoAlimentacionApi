@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SistemaMonitoreoAlimentacionApi.Controllers
 {
-    public class DiadelaSemanaController : Controller
+    public class DiasdelaSemanaController : Controller
     {
         // GET: DiadelaSemanaController
         public ActionResult Index()

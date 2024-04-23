@@ -3,27 +3,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SistemaMonitoreoAlimentacionApi.Controllers
 {
-    public class AvisoController : Controller
+    public class CronologiasController : Controller
     {
-        // GET: AvisoController
+        // GET: CronologiaController
         public ActionResult Index()
         {
             return View();
         }
 
-        // GET: AvisoController/Details/5
+        // GET: CronologiaController/Details/5
         public ActionResult Details(int id)
         {
             return View();
         }
 
-        // GET: AvisoController/Create
+        // GET: CronologiaController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: AvisoController/Create
+        // POST: CronologiaController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(IFormCollection collection)
@@ -38,13 +38,13 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             }
         }
 
-        // GET: AvisoController/Edit/5
+        // GET: CronologiaController/Edit/5
         public ActionResult Edit(int id)
         {
             return View();
         }
 
-        // POST: AvisoController/Edit/5
+        // POST: CronologiaController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -59,13 +59,13 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             }
         }
 
-        // GET: AvisoController/Delete/5
+        // GET: CronologiaController/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: AvisoController/Delete/5
+        // POST: CronologiaController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
