@@ -11,25 +11,25 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
     [Route("api/[controller]")]
     public class GatosController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
+        private readonly ApplicationDbContext context;
+        private readonly IMapper mapper;
 
         public GatosController(ApplicationDbContext context, IMapper mapper) { 
-            this._context = context;
-            this._mapper = mapper;
+            this.context = context;
+            this.mapper = mapper;
         }
 
         #region Get
         [HttpGet]
         public async Task<ActionResult<List<Gato>>> GetGatos() 
         { 
-            return await _context.Gatos.ToListAsync();
+            return await context.Gatos.ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Gato>> GetGato(Guid Id)
         {
-            var gato =  await _context.Gatos.FirstOrDefaultAsync(x => x.GatoId == Id);
+            var gato =  await context.Gatos.FirstOrDefaultAsync(x => x.GatoId == Id);
 
             if(gato == null)
             {
@@ -45,7 +45,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         [HttpPost]
         public async Task<ActionResult> PostGato([FromBody] GatoCreacionDto gatoCreacionDto)
         {
-            var existeMismoGato = await _context.Gatos.FirstOrDefaultAsync(x => x.Nombre == gatoCreacionDto.Nombre);
+            var existeMismoGato = await context.Gatos.FirstOrDefaultAsync(x => x.Nombre == gatoCreacionDto.Nombre);
 
             if(existeMismoGato != null)
             {
@@ -55,10 +55,10 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
                 }
             }
 
-            var gato = _mapper.Map<Gato>(gatoCreacionDto);
+            var gato = mapper.Map<Gato>(gatoCreacionDto);
 
-            _context.Gatos.Add(gato);
-            await _context.SaveChangesAsync();
+            context.Gatos.Add(gato);
+            await context.SaveChangesAsync();
             return Ok();
 
         }
