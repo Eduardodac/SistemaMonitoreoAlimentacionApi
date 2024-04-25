@@ -67,31 +67,77 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             return Ok();
 
         }
-
+        #endregion
+        #region Put
         [HttpPut("activar/{NumeroRegistro}")]
         public async Task<ActionResult> ActivarCollar([FromRoute] string NumeroRegistro, [FromBody] CollarActivarDto collarActivarDto)
         {
-            var collarRegistroExistente = await context.Collares.FirstOrDefaultAsync(c => c.NumeroRegistro.Equals(NumeroRegistro));
-            if (collarRegistroExistente == null)
+            var collarExistente = await context.Collares.FirstOrDefaultAsync(c => c.NumeroRegistro.Equals(NumeroRegistro));
+            if (collarExistente == null)
             {
                 return BadRequest($"El collar con número de registro {NumeroRegistro} no existe");
             }
 
-            if (collarActivarDto.GatoId == null)
+            var gatoExistente = await context.Gatos.AnyAsync(g => g.GatoId.Equals(collarActivarDto.GatoId));
+
+            if (!gatoExistente)
             {
-                return BadRequest($"Falta Id del gato");
+                return BadRequest($"El id {collarActivarDto.GatoId} no existe");
             }
 
-            if(collarRegistroExistente.EstatusActivacion)
+            if(collarExistente.EstatusActivacion)
             {
                 return BadRequest($"El collar ya ha sido activado, dos gatos no pueden estar sujetos al mismo collar");
             }
 
-            collarRegistroExistente.EstatusActivacion = true;
-            collarRegistroExistente.FechaActivacion = DateTime.Now;
-            collarRegistroExistente.GatoId = collarActivarDto.GatoId;
+            collarExistente.EstatusActivacion = true;
+            collarExistente.FechaActivacion = DateTime.Now;
+            collarExistente.GatoId = collarActivarDto.GatoId;
 
-            context.Update(collarRegistroExistente);
+            context.Update(collarExistente);
+            await context.SaveChangesAsync();
+
+            return Ok();
+
+
+        }
+
+        [HttpPut("desactivar/{NumeroRegistro}")]
+        public async Task<ActionResult> DesactivarCollar([FromRoute] string NumeroRegistro, [FromBody] CollarDesactivarDto collarDesactivarDto)
+        { 
+            
+
+            var gatoExistente = await context.Gatos.FirstOrDefaultAsync(g => g.GatoId.Equals(collarDesactivarDto.GatoId));
+
+            if (gatoExistente == null)
+            {
+                return BadRequest($"El id {collarDesactivarDto.GatoId} de gato no existe");
+            }
+
+            var usuarioExistente = await context.Usuarios.FirstOrDefaultAsync(u => u.UsuarioId.Equals(collarDesactivarDto.UsuarioId));
+
+            if(usuarioExistente == null)
+            {
+                return BadRequest($"El id {collarDesactivarDto.UsuarioId} de usuario no existe");
+            }
+
+            if (gatoExistente.UsuarioId != usuarioExistente.UsuarioId)
+            {
+                return BadRequest($"No tienes acceso a este collar");
+            }
+            
+            var collarExistente = await context.Collares.FirstOrDefaultAsync(c => c.NumeroRegistro.Equals(NumeroRegistro));
+
+            if (collarExistente == null)
+            {
+                return BadRequest($"El collar con número de registro {NumeroRegistro} no existe");
+            }
+
+            collarExistente.EstatusActivacion = false;
+            collarExistente.FechaActivacion = null;
+            collarExistente.GatoId = null;
+
+            context.Update(collarExistente);
             await context.SaveChangesAsync();
 
             return Ok();
