@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SistemaMonitoreoAlimentacionApi;
 
@@ -11,9 +12,10 @@ using SistemaMonitoreoAlimentacionApi;
 namespace SistemaMonitoreoAlimentacionApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240425053241_ModificaCollar")]
+    partial class ModificaCollar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,8 +55,9 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("EstatusActivacion")
-                        .HasColumnType("bit");
+                    b.Property<string>("EstatusActivacion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("FechaActivacion")
                         .HasColumnType("datetime2");

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Win32;
 using SistemaMonitoreoAlimentacionApi.Dtos.Collar;
 using SistemaMonitoreoAlimentacionApi.Dtos.Gato;
 using SistemaMonitoreoAlimentacionApi.Entidades;
@@ -44,8 +45,8 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         #endregion
 
         #region Post
-        [HttpPost]
-        public async Task<ActionResult> PostCollar(CollarCreacionDto collarCreacionDto)
+        [HttpPost("crear")]
+        public async Task<ActionResult> CrearCollar(CollarCreacionDto collarCreacionDto)
         { 
             var collarIdExistente = await context.Collares.AnyAsync(c => c.CollarId.Equals(collarCreacionDto.CollarId));
             if(collarIdExistente == true)
@@ -66,6 +67,8 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             return Ok();
 
         }
+
+ 
         #endregion
     }
 }
