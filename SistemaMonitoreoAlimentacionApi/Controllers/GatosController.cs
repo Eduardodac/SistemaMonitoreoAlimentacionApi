@@ -26,10 +26,11 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             return await context.Gatos.ToListAsync();
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Gato>> GetGato(Guid Id)
+        [HttpGet("{gatoId}")]
+        public async Task<ActionResult<Gato>> GetGato([FromRoute]Guid gatoId)
         {
-            var gato =  await context.Gatos.FirstOrDefaultAsync(x => x.GatoId == Id);
+
+            var gato =  await context.Gatos.FirstOrDefaultAsync(x => x.GatoId == gatoId);
 
             if(gato == null)
             {

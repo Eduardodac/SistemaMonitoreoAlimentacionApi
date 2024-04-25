@@ -1,19 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SistemaMonitoreoAlimentacionApi.Entidades
+namespace SistemaMonitoreoAlimentacionApi.Dtos.Collar
 {
-    public class Collar
+    public class CollarCreacionDto
     {
         public Guid CollarId { get; set; } = Guid.Empty!;
-        public Guid UsuarioId { get; set; }
-        [Required]
         public DateTime? FechaSalida { get; set; }
-        public DateTime? FechaActivacion{ get; set; }
-        [Required]
         public string NumeroRegistro { get; set; } = null!;
-        [Required]
         public string EstatusActivacion { get; set; } = null!;
-        public Usuario? Usuario { get; set; }
     }
-
 }

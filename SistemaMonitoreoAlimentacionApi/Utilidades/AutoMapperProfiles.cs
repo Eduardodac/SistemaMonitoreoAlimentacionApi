@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SistemaMonitoreoAlimentacionApi.Dtos.Collar;
 using SistemaMonitoreoAlimentacionApi.Dtos.Gato;
 using SistemaMonitoreoAlimentacionApi.Entidades;
 
@@ -9,6 +10,7 @@ namespace SistemaMonitoreoAlimentacionApi.Utilidades
         public AutoMapperProfiles() 
         {
             CreateMap<GatoCreacionDto, Gato>();
+            CreateMap<CollarCreacionDto, Collar>();
         }
     }
 }
