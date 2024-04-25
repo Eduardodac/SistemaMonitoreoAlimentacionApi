@@ -10,20 +10,6 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Collares",
-                columns: table => new
-                {
-                    CollarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FechaSalida = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    NumeroRegistro = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EstatusActivacion = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Collares", x => x.CollarId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "DiadelaSemana",
                 columns: table => new
                 {
@@ -100,7 +86,6 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 {
                     GatoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UsuarioId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CollarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Raza = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Sexo = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -110,12 +95,6 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Gatos", x => x.GatoId);
-                    table.ForeignKey(
-                        name: "FK_Gatos_Collares_CollarId",
-                        column: x => x.CollarId,
-                        principalTable: "Collares",
-                        principalColumn: "CollarId",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Gatos_Usuarios_UsuarioId",
                         column: x => x.UsuarioId,
@@ -147,6 +126,28 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         column: x => x.UsuarioId,
                         principalTable: "Usuarios",
                         principalColumn: "UsuarioId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Collares",
+                columns: table => new
+                {
+                    CollarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    GatoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FechaSalida = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FechaActivacion = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    NumeroRegistro = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EstatusActivacion = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Collares", x => x.CollarId);
+                    table.ForeignKey(
+                        name: "FK_Collares_Gatos_GatoId",
+                        column: x => x.GatoId,
+                        principalTable: "Gatos",
+                        principalColumn: "GatoId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -208,6 +209,12 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 column: "UsuarioId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Collares_GatoId",
+                table: "Collares",
+                column: "GatoId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Cronologias_GatoId",
                 table: "Cronologias",
                 column: "GatoId");
@@ -221,11 +228,6 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 name: "IX_Eventos_GatoId",
                 table: "Eventos",
                 column: "GatoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Gatos_CollarId",
-                table: "Gatos",
-                column: "CollarId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Gatos_UsuarioId",
@@ -256,6 +258,9 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 name: "Avisos");
 
             migrationBuilder.DropTable(
+                name: "Collares");
+
+            migrationBuilder.DropTable(
                 name: "Cronologias");
 
             migrationBuilder.DropTable(
@@ -269,9 +274,6 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "DiadelaSemana");
-
-            migrationBuilder.DropTable(
-                name: "Collares");
 
             migrationBuilder.DropTable(
                 name: "Usuarios");

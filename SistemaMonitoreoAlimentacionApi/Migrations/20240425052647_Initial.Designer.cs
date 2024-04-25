@@ -12,7 +12,7 @@ using SistemaMonitoreoAlimentacionApi;
 namespace SistemaMonitoreoAlimentacionApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240423065127_Initial")]
+    [Migration("20240425052647_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -59,14 +59,24 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("FechaSalida")
+                    b.Property<DateTime?>("FechaActivacion")
                         .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaSalida")
+                        .IsRequired()
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("GatoId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("NumeroRegistro")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CollarId");
+
+                    b.HasIndex("GatoId")
+                        .IsUnique();
 
                     b.ToTable("Collares");
                 });
@@ -179,9 +189,6 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CollarId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Edad")
                         .HasColumnType("nvarchar(max)");
 
@@ -202,8 +209,6 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("GatoId");
-
-                    b.HasIndex("CollarId");
 
                     b.HasIndex("UsuarioId");
 
@@ -285,6 +290,17 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Collar", b =>
+                {
+                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Gato", "Gato")
+                        .WithOne("Collar")
+                        .HasForeignKey("SistemaMonitoreoAlimentacionApi.Entidades.Collar", "GatoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Gato");
+                });
+
             modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Cronologia", b =>
                 {
                     b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Gato", "Gato")
@@ -317,19 +333,11 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
 
             modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Gato", b =>
                 {
-                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Collar", "Collar")
-                        .WithMany()
-                        .HasForeignKey("CollarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Usuario", "Usuario")
                         .WithMany()
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Collar");
 
                     b.Navigation("Usuario");
                 });
@@ -365,6 +373,11 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
             modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Dosificador", b =>
                 {
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Gato", b =>
+                {
+                    b.Navigation("Collar");
                 });
 #pragma warning restore 612, 618
         }
