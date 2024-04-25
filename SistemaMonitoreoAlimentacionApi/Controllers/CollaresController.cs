@@ -68,7 +68,36 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
         }
 
- 
+        [HttpPut("activar/{NumeroRegistro}")]
+        public async Task<ActionResult> ActivarCollar([FromRoute] string NumeroRegistro, [FromBody] CollarActivarDto collarActivarDto)
+        {
+            var collarRegistroExistente = await context.Collares.FirstOrDefaultAsync(c => c.NumeroRegistro.Equals(NumeroRegistro));
+            if (collarRegistroExistente == null)
+            {
+                return BadRequest($"El collar con número de registro {NumeroRegistro} no existe");
+            }
+
+            if (collarActivarDto.GatoId == null)
+            {
+                return BadRequest($"Falta Id del gato");
+            }
+
+            if(collarRegistroExistente.EstatusActivacion)
+            {
+                return BadRequest($"El collar ya ha sido activado, dos gatos no pueden estar sujetos al mismo collar");
+            }
+
+            collarRegistroExistente.EstatusActivacion = true;
+            collarRegistroExistente.FechaActivacion = DateTime.Now;
+            collarRegistroExistente.GatoId = collarActivarDto.GatoId;
+
+            context.Update(collarRegistroExistente);
+            await context.SaveChangesAsync();
+
+            return Ok();
+
+
+        }
         #endregion
     }
 }
