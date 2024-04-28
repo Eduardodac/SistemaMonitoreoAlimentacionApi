@@ -10,6 +10,21 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Collares",
+                columns: table => new
+                {
+                    CollarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FechaSalida = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FechaActivacion = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    NumeroRegistro = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EstatusActivacion = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Collares", x => x.CollarId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DiadelaSemana",
                 columns: table => new
                 {
@@ -28,12 +43,42 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 {
                     DosificadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FechaSalida = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    FechaActivacion = table.Column<DateTime>(type: "datetime2", nullable: true),
                     NumeroRegistro = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EstatusActivacion = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Dosificadores", x => x.DosificadorId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Registros",
+                columns: table => new
+                {
+                    RegistroId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DosificadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CollarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Duracion = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Consumo = table.Column<double>(type: "float", nullable: false),
+                    Hora = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IntegradoAAnalisis = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Registros", x => x.RegistroId);
+                    table.ForeignKey(
+                        name: "FK_Registros_Collares_CollarId",
+                        column: x => x.CollarId,
+                        principalTable: "Collares",
+                        principalColumn: "CollarId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Registros_Dosificadores_DosificadorId",
+                        column: x => x.DosificadorId,
+                        principalTable: "Dosificadores",
+                        principalColumn: "DosificadorId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -67,14 +112,15 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     UsuarioId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LimpiarContenedor = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LimpiarPlato = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Caducidad = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Caducidad = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AlimentoDisponible = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Avisos", x => x.AvisoId);
                     table.ForeignKey(
-                        name: "FK_Avisos_Usuarios_UsuarioId",
-                        column: x => x.UsuarioId,
+                        name: "FK_Avisos_Usuarios_AvisoId",
+                        column: x => x.AvisoId,
                         principalTable: "Usuarios",
                         principalColumn: "UsuarioId",
                         onDelete: ReferentialAction.Cascade);
@@ -86,6 +132,7 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 {
                     GatoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UsuarioId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CollarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Raza = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Sexo = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -95,6 +142,12 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Gatos", x => x.GatoId);
+                    table.ForeignKey(
+                        name: "FK_Gatos_Collares_CollarId",
+                        column: x => x.CollarId,
+                        principalTable: "Collares",
+                        principalColumn: "CollarId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Gatos_Usuarios_UsuarioId",
                         column: x => x.UsuarioId,
@@ -130,32 +183,10 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Collares",
+                name: "ActividadesFelinas",
                 columns: table => new
                 {
-                    CollarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    GatoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FechaSalida = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    FechaActivacion = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    NumeroRegistro = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EstatusActivacion = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Collares", x => x.CollarId);
-                    table.ForeignKey(
-                        name: "FK_Collares_Gatos_GatoId",
-                        column: x => x.GatoId,
-                        principalTable: "Gatos",
-                        principalColumn: "GatoId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Cronologias",
-                columns: table => new
-                {
-                    CronologiaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ActividadFelinaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     GatoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FechaInicio = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FechaFin = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -165,38 +196,9 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Cronologias", x => x.CronologiaId);
+                    table.PrimaryKey("PK_ActividadesFelinas", x => x.ActividadFelinaId);
                     table.ForeignKey(
-                        name: "FK_Cronologias_Gatos_GatoId",
-                        column: x => x.GatoId,
-                        principalTable: "Gatos",
-                        principalColumn: "GatoId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Eventos",
-                columns: table => new
-                {
-                    EventoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DosificadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    GatoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Duracion = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Consumo = table.Column<double>(type: "float", nullable: false),
-                    Hora = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IntegradoAnalisis = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Eventos", x => x.EventoId);
-                    table.ForeignKey(
-                        name: "FK_Eventos_Dosificadores_DosificadorId",
-                        column: x => x.DosificadorId,
-                        principalTable: "Dosificadores",
-                        principalColumn: "DosificadorId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Eventos_Gatos_GatoId",
+                        name: "FK_ActividadesFelinas_Gatos_GatoId",
                         column: x => x.GatoId,
                         principalTable: "Gatos",
                         principalColumn: "GatoId",
@@ -204,30 +206,15 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Avisos_UsuarioId",
-                table: "Avisos",
-                column: "UsuarioId");
+                name: "IX_ActividadesFelinas_GatoId",
+                table: "ActividadesFelinas",
+                column: "GatoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Collares_GatoId",
-                table: "Collares",
-                column: "GatoId",
+                name: "IX_Gatos_CollarId",
+                table: "Gatos",
+                column: "CollarId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Cronologias_GatoId",
-                table: "Cronologias",
-                column: "GatoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Eventos_DosificadorId",
-                table: "Eventos",
-                column: "DosificadorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Eventos_GatoId",
-                table: "Eventos",
-                column: "GatoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Gatos_UsuarioId",
@@ -245,6 +232,16 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 column: "UsuarioId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Registros_CollarId",
+                table: "Registros",
+                column: "CollarId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Registros_DosificadorId",
+                table: "Registros",
+                column: "DosificadorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Usuarios_DosificadorId",
                 table: "Usuarios",
                 column: "DosificadorId",
@@ -255,25 +252,25 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "ActividadesFelinas");
+
+            migrationBuilder.DropTable(
                 name: "Avisos");
 
             migrationBuilder.DropTable(
-                name: "Collares");
-
-            migrationBuilder.DropTable(
-                name: "Cronologias");
-
-            migrationBuilder.DropTable(
-                name: "Eventos");
-
-            migrationBuilder.DropTable(
                 name: "Horarios");
+
+            migrationBuilder.DropTable(
+                name: "Registros");
 
             migrationBuilder.DropTable(
                 name: "Gatos");
 
             migrationBuilder.DropTable(
                 name: "DiadelaSemana");
+
+            migrationBuilder.DropTable(
+                name: "Collares");
 
             migrationBuilder.DropTable(
                 name: "Usuarios");

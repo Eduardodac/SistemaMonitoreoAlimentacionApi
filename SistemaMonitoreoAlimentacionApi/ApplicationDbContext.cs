@@ -16,10 +16,15 @@ namespace SistemaMonitoreoAlimentacionApi
                 .WithOne(d => d.Dosificador)
                 .HasForeignKey<Usuario>(u => u.DosificadorId);
 
-            modelBuilder.Entity<Gato>()
-                .HasOne(c => c.Collar)
-                .WithOne(g => g.Gato)
-                .HasForeignKey<Collar>(c => c.GatoId);
+            modelBuilder.Entity<Collar>()
+                .HasOne(g => g.Gato)
+                .WithOne(c => c.Collar)
+                .HasForeignKey<Gato>(g => g.CollarId);
+
+            modelBuilder.Entity<Usuario>()
+                .HasOne(a => a.Aviso)
+                .WithOne(u => u.Usuario)
+                .HasForeignKey<Aviso>(a => a.AvisoId);
 
             base.OnModelCreating(modelBuilder);
         }
@@ -28,8 +33,8 @@ namespace SistemaMonitoreoAlimentacionApi
         public DbSet<Dosificador> Dosificadores { get; set; }
         public DbSet<Gato> Gatos { get; set; }
         public DbSet<Collar> Collares { get; set; }
-        public DbSet<Cronologia> Cronologias { get; set; }
-        public DbSet<Evento> Eventos { get; set; }
+        public DbSet<ActividadFelina> ActividadesFelinas { get; set; }
+        public DbSet<Registro> Registros { get; set; }
         public DbSet<Horario> Horarios { get; set; }
         public DbSet<Aviso> Avisos { get; set; }
         public DbSet<DiadelaSemana> DiadelaSemana { get; set; }

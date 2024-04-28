@@ -6,10 +6,12 @@ namespace SistemaMonitoreoAlimentacionApi.Entidades
     {
         public Guid DosificadorId { get; set; } = Guid.Empty!;
         public DateTime? FechaSalida { get; set; }
+        public DateTime? FechaActivacion { get; set; }
         [Required]
         public string NumeroRegistro { get; set; } = null!;
         [Required]
         public Boolean EstatusActivacion { get; set; } = false;
         public Usuario? Usuario { get; set; }
+
     }
 }

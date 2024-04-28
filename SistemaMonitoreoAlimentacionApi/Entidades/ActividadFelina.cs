@@ -2,9 +2,9 @@
 
 namespace SistemaMonitoreoAlimentacionApi.Entidades
 {
-    public class Cronologia
+    public class ActividadFelina
     {
-        public Guid CronologiaId { get; set; } = Guid.Empty!;
+        public Guid ActividadFelinaId { get; set; } = Guid.Empty!;
         [Required]
         public Guid GatoId { get; set; } = Guid.Empty!;
         [Required]

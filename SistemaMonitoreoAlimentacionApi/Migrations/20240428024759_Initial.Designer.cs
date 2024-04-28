@@ -12,7 +12,7 @@ using SistemaMonitoreoAlimentacionApi;
 namespace SistemaMonitoreoAlimentacionApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240425052647_Initial")]
+    [Migration("20240428024759_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,66 +24,9 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Aviso", b =>
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.ActividadFelina", b =>
                 {
-                    b.Property<Guid>("AvisoId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Caducidad")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("LimpiarContenedor")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("LimpiarPlato")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UsuarioId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("AvisoId");
-
-                    b.HasIndex("UsuarioId");
-
-                    b.ToTable("Avisos");
-                });
-
-            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Collar", b =>
-                {
-                    b.Property<Guid>("CollarId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("EstatusActivacion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("FechaActivacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FechaSalida")
-                        .IsRequired()
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("GatoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("NumeroRegistro")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CollarId");
-
-                    b.HasIndex("GatoId")
-                        .IsUnique();
-
-                    b.ToTable("Collares");
-                });
-
-            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Cronologia", b =>
-                {
-                    b.Property<Guid>("CronologiaId")
+                    b.Property<Guid>("ActividadFelinaId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -105,11 +48,61 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     b.Property<Guid>("GatoId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("CronologiaId");
+                    b.HasKey("ActividadFelinaId");
 
                     b.HasIndex("GatoId");
 
-                    b.ToTable("Cronologias");
+                    b.ToTable("ActividadesFelinas");
+                });
+
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Aviso", b =>
+                {
+                    b.Property<Guid>("AvisoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AlimentoDisponible")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Caducidad")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LimpiarContenedor")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LimpiarPlato")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("AvisoId");
+
+                    b.ToTable("Avisos");
+                });
+
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Collar", b =>
+                {
+                    b.Property<Guid>("CollarId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("EstatusActivacion")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("FechaActivacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaSalida")
+                        .IsRequired()
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NumeroRegistro")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CollarId");
+
+                    b.ToTable("Collares");
                 });
 
             modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.DiadelaSemana", b =>
@@ -138,6 +131,9 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     b.Property<bool>("EstatusActivacion")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("FechaActivacion")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("FechaSalida")
                         .HasColumnType("datetime2");
 
@@ -150,43 +146,14 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     b.ToTable("Dosificadores");
                 });
 
-            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Evento", b =>
-                {
-                    b.Property<Guid>("EventoId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("Consumo")
-                        .HasColumnType("float");
-
-                    b.Property<Guid>("DosificadorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Duracion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("GatoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Hora")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IntegradoAnalisis")
-                        .HasColumnType("bit");
-
-                    b.HasKey("EventoId");
-
-                    b.HasIndex("DosificadorId");
-
-                    b.HasIndex("GatoId");
-
-                    b.ToTable("Eventos");
-                });
-
             modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Gato", b =>
                 {
                     b.Property<Guid>("GatoId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CollarId")
+                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Edad")
@@ -209,6 +176,9 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("GatoId");
+
+                    b.HasIndex("CollarId")
+                        .IsUnique();
 
                     b.HasIndex("UsuarioId");
 
@@ -237,6 +207,39 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     b.HasIndex("UsuarioId");
 
                     b.ToTable("Horarios");
+                });
+
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Registro", b =>
+                {
+                    b.Property<Guid>("RegistroId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CollarId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("Consumo")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("DosificadorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Duracion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Hora")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IntegradoAAnalisis")
+                        .HasColumnType("bit");
+
+                    b.HasKey("RegistroId");
+
+                    b.HasIndex("CollarId");
+
+                    b.HasIndex("DosificadorId");
+
+                    b.ToTable("Registros");
                 });
 
             modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Usuario", b =>
@@ -279,65 +282,43 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     b.ToTable("Usuarios");
                 });
 
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.ActividadFelina", b =>
+                {
+                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Gato", "Gato")
+                        .WithMany()
+                        .HasForeignKey("GatoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Gato");
+                });
+
             modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Aviso", b =>
                 {
                     b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId")
+                        .WithOne("Aviso")
+                        .HasForeignKey("SistemaMonitoreoAlimentacionApi.Entidades.Aviso", "AvisoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Collar", b =>
-                {
-                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Gato", "Gato")
-                        .WithOne("Collar")
-                        .HasForeignKey("SistemaMonitoreoAlimentacionApi.Entidades.Collar", "GatoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Gato");
-                });
-
-            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Cronologia", b =>
-                {
-                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Gato", "Gato")
-                        .WithMany()
-                        .HasForeignKey("GatoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Gato");
-                });
-
-            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Evento", b =>
-                {
-                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Dosificador", "Dosificador")
-                        .WithMany()
-                        .HasForeignKey("DosificadorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Gato", "Gato")
-                        .WithMany()
-                        .HasForeignKey("GatoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Dosificador");
-
-                    b.Navigation("Gato");
-                });
-
             modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Gato", b =>
                 {
+                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Collar", "Collar")
+                        .WithOne("Gato")
+                        .HasForeignKey("SistemaMonitoreoAlimentacionApi.Entidades.Gato", "CollarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Usuario", "Usuario")
                         .WithMany()
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Collar");
 
                     b.Navigation("Usuario");
                 });
@@ -361,6 +342,25 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Registro", b =>
+                {
+                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Collar", "Collar")
+                        .WithMany()
+                        .HasForeignKey("CollarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Dosificador", "Dosificador")
+                        .WithMany()
+                        .HasForeignKey("DosificadorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Collar");
+
+                    b.Navigation("Dosificador");
+                });
+
             modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Usuario", b =>
                 {
                     b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Dosificador", "Dosificador")
@@ -370,14 +370,19 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     b.Navigation("Dosificador");
                 });
 
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Collar", b =>
+                {
+                    b.Navigation("Gato");
+                });
+
             modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Dosificador", b =>
                 {
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Gato", b =>
+            modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Usuario", b =>
                 {
-                    b.Navigation("Collar");
+                    b.Navigation("Aviso");
                 });
 #pragma warning restore 612, 618
         }

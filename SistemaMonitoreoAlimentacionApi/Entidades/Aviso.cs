@@ -12,6 +12,7 @@ namespace SistemaMonitoreoAlimentacionApi.Entidades
         public DateTime LimpiarPlato { get; set; } = DateTime.Now;
         [Required]
         public DateTime Caducidad { get; set; } = DateTime.Now;
+        public int AlimentoDisponible { get; set; } = 0;
         public Usuario Usuario { get; set; }
     }
 }

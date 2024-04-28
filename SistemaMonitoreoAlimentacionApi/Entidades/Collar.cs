@@ -5,7 +5,6 @@ namespace SistemaMonitoreoAlimentacionApi.Entidades
     public class Collar
     {
         public Guid CollarId { get; set; } = Guid.Empty!;
-        public Guid? GatoId { get; set; }
         [Required]
         public DateTime? FechaSalida { get; set; }
         public DateTime? FechaActivacion{ get; set; }

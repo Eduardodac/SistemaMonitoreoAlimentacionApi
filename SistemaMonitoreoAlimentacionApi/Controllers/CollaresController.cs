@@ -69,81 +69,81 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         }
         #endregion
         #region Put
-        [HttpPut("activar/{NumeroRegistro}")]
-        public async Task<ActionResult> ActivarCollar([FromRoute] string NumeroRegistro, [FromBody] CollarActivarDto collarActivarDto)
-        {
-            var collarExistente = await context.Collares.FirstOrDefaultAsync(c => c.NumeroRegistro.Equals(NumeroRegistro));
-            if (collarExistente == null)
-            {
-                return BadRequest($"El collar con número de registro {NumeroRegistro} no existe");
-            }
+        //[HttpPut("activar/{NumeroRegistro}")]
+        //public async Task<ActionResult> ActivarCollar([FromRoute] string NumeroRegistro, [FromBody] CollarActivarDto collarActivarDto)
+        //{
+        //    var collarExistente = await context.Collares.FirstOrDefaultAsync(c => c.NumeroRegistro.Equals(NumeroRegistro));
+        //    if (collarExistente == null)
+        //    {
+        //        return BadRequest($"El collar con número de registro {NumeroRegistro} no existe");
+        //    }
 
-            var gatoExistente = await context.Gatos.AnyAsync(g => g.GatoId.Equals(collarActivarDto.GatoId));
+        //    var gatoExistente = await context.Gatos.AnyAsync(g => g.GatoId.Equals(collarActivarDto.GatoId));
 
-            if (!gatoExistente)
-            {
-                return BadRequest($"El id {collarActivarDto.GatoId} no existe");
-            }
+        //    if (!gatoExistente)
+        //    {
+        //        return BadRequest($"El id {collarActivarDto.GatoId} no existe");
+        //    }
 
-            if(collarExistente.EstatusActivacion)
-            {
-                return BadRequest($"El collar ya ha sido activado, dos gatos no pueden estar sujetos al mismo collar");
-            }
+        //    if(collarExistente.EstatusActivacion)
+        //    {
+        //        return BadRequest($"El collar ya ha sido activado, dos gatos no pueden estar sujetos al mismo collar");
+        //    }
 
-            collarExistente.EstatusActivacion = true;
-            collarExistente.FechaActivacion = DateTime.Now;
-            collarExistente.GatoId = collarActivarDto.GatoId;
+        //    collarExistente.EstatusActivacion = true;
+        //    collarExistente.FechaActivacion = DateTime.Now;
+        //    collarExistente.GatoId = collarActivarDto.GatoId;
 
-            context.Update(collarExistente);
-            await context.SaveChangesAsync();
+        //    context.Update(collarExistente);
+        //    await context.SaveChangesAsync();
 
-            return Ok();
+        //    return Ok();
 
 
-        }
+        //}
 
-        [HttpPut("desactivar/{NumeroRegistro}")]
-        public async Task<ActionResult> DesactivarCollar([FromRoute] string NumeroRegistro, [FromBody] CollarDesactivarDto collarDesactivarDto)
-        { 
+        //[HttpPut("desactivar/{NumeroRegistro}")]
+        //public async Task<ActionResult> DesactivarCollar([FromRoute] string NumeroRegistro, [FromBody] CollarDesactivarDto collarDesactivarDto)
+        //{ 
             
 
-            var gatoExistente = await context.Gatos.FirstOrDefaultAsync(g => g.GatoId.Equals(collarDesactivarDto.GatoId));
+        //    var gatoExistente = await context.Gatos.FirstOrDefaultAsync(g => g.GatoId.Equals(collarDesactivarDto.GatoId));
 
-            if (gatoExistente == null)
-            {
-                return BadRequest($"El id {collarDesactivarDto.GatoId} de gato no existe");
-            }
+        //    if (gatoExistente == null)
+        //    {
+        //        return BadRequest($"El id {collarDesactivarDto.GatoId} de gato no existe");
+        //    }
 
-            var usuarioExistente = await context.Usuarios.FirstOrDefaultAsync(u => u.UsuarioId.Equals(collarDesactivarDto.UsuarioId));
+        //    var usuarioExistente = await context.Usuarios.FirstOrDefaultAsync(u => u.UsuarioId.Equals(collarDesactivarDto.UsuarioId));
 
-            if(usuarioExistente == null)
-            {
-                return BadRequest($"El id {collarDesactivarDto.UsuarioId} de usuario no existe");
-            }
+        //    if(usuarioExistente == null)
+        //    {
+        //        return BadRequest($"El id {collarDesactivarDto.UsuarioId} de usuario no existe");
+        //    }
 
-            if (gatoExistente.UsuarioId != usuarioExistente.UsuarioId)
-            {
-                return BadRequest($"No tienes acceso a este collar");
-            }
+        //    if (gatoExistente.UsuarioId != usuarioExistente.UsuarioId)
+        //    {
+        //        return BadRequest($"No tienes acceso a este collar");
+        //    }
             
-            var collarExistente = await context.Collares.FirstOrDefaultAsync(c => c.NumeroRegistro.Equals(NumeroRegistro));
+        //    var collarExistente = await context.Collares.FirstOrDefaultAsync(c => c.NumeroRegistro.Equals(NumeroRegistro));
 
-            if (collarExistente == null)
-            {
-                return BadRequest($"El collar con número de registro {NumeroRegistro} no existe");
-            }
+        //    if (collarExistente == null)
+        //    {
+        //        return BadRequest($"El collar con número de registro {NumeroRegistro} no existe");
+        //    }
 
-            collarExistente.EstatusActivacion = false;
-            collarExistente.FechaActivacion = null;
-            collarExistente.GatoId = null;
+        //    collarExistente.EstatusActivacion = false;
+        //    collarExistente.FechaActivacion = null;
+        //    collarExistente.GatoId = null;
 
-            context.Update(collarExistente);
-            await context.SaveChangesAsync();
+        //    context.Update(collarExistente);
+        //    await context.SaveChangesAsync();
 
-            return Ok();
+        //    return Ok();
 
 
-        }
+        //}
         #endregion
     }
 }
