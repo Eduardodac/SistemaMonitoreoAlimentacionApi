@@ -7,8 +7,7 @@ namespace SistemaMonitoreoAlimentacionApi.Entidades
         public Guid GatoId { get; set; } = Guid.Empty!;
         [Required]
         public Guid UsuarioId { get; set; } = Guid.Empty!;
-        [Required]
-        public Guid? CollarId { get; set; } = Guid.Empty!;
+        public Guid? CollarId { get; set; } 
         [Required]
         public string Nombre { get; set; } = null!;
         public string? Raza { get; set; }

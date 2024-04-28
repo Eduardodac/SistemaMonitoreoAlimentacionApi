@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SistemaMonitoreoAlimentacionApi.Dtos.Collar;
 using SistemaMonitoreoAlimentacionApi.Dtos.Gato;
 using SistemaMonitoreoAlimentacionApi.Entidades;
 
@@ -64,5 +65,71 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
         }
         #endregion
-    }
+
+        #region Put
+        [HttpPut("activarCollar/{NumeroRegistro}")]
+        public async Task<ActionResult> ActivarCollar([FromRoute] string NumeroRegistro, [FromBody] ModificarCollarDto modificarCollarDto)
+        {
+            var collarExistente = await context.Collares.FirstOrDefaultAsync(c => c.NumeroRegistro.Equals(NumeroRegistro));
+            if (collarExistente == null)
+            {
+                return BadRequest($"El collar con número de registro {NumeroRegistro} no existe");
+            }
+
+            var gatoExistente = await context.Gatos.FirstOrDefaultAsync(g => g.GatoId.Equals(modificarCollarDto.GatoId));
+
+            if (gatoExistente == null)
+            {
+                return BadRequest($"El id {modificarCollarDto.GatoId} no existe");
+            }
+
+
+            collarExistente.EstatusActivacion = true;
+            collarExistente.FechaActivacion = DateTime.Now;
+            gatoExistente.CollarId = collarExistente.CollarId;
+
+            context.Update(collarExistente);
+            await context.SaveChangesAsync();
+
+            context.Update(gatoExistente);
+            await context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpPut("desactivarCollar/{NumeroRegistro}")]
+        public async Task<ActionResult> DesactivarCollar([FromRoute] string NumeroRegistro, [FromBody] ModificarCollarDto modificarCollarDto)
+        {
+
+            var gatoExistente = await context.Gatos.FirstOrDefaultAsync(g => g.GatoId.Equals(modificarCollarDto.GatoId));
+
+            if (gatoExistente == null)
+            {
+                return BadRequest($"El id {modificarCollarDto.GatoId} de gato no existe");
+            }
+
+            var collarExistente = await context.Collares.FirstOrDefaultAsync(c => c.NumeroRegistro.Equals(NumeroRegistro));
+
+            if (collarExistente == null)
+            {
+                return BadRequest($"El collar con número de registro {NumeroRegistro} no existe");
+            }
+
+            collarExistente.EstatusActivacion = false;
+            collarExistente.FechaActivacion = null;
+            gatoExistente.CollarId = null;
+
+            context.Update(collarExistente);
+            await context.SaveChangesAsync();
+
+            context.Update(gatoExistente);
+            await context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+
+
+            #endregion
+        }
 }
