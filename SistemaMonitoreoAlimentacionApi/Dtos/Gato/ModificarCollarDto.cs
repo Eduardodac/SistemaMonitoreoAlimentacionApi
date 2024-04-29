@@ -2,6 +2,6 @@
 {
     public class ModificarCollarDto
     {
-        public Guid GatoId { get; set; }
+        public string NumeroRegistro { get; set; } = string.Empty;
     }
 }

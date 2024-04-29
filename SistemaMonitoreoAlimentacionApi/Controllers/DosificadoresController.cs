@@ -1,83 +1,65 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SistemaMonitoreoAlimentacionApi.Dtos.Dosificador;
+using SistemaMonitoreoAlimentacionApi.Entidades;
 
 namespace SistemaMonitoreoAlimentacionApi.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class DosificadoresController : Controller
     {
-        // GET: DosificadorController
-        public ActionResult Index()
+        private readonly ApplicationDbContext context;
+
+        public IMapper mapper { get; }
+
+        public DosificadoresController(ApplicationDbContext context, IMapper mapper) 
         {
-            return View();
+            this.context = context;
+            this.mapper = mapper;
+        }
+        #region Get
+        [HttpGet]
+        public async Task<ActionResult<List<Dosificador>>> GetDosificadores()
+        {
+            return await context.Dosificadores.ToListAsync();
         }
 
-        // GET: DosificadorController/Details/5
-        public ActionResult Details(int id)
+        [HttpGet("{dosificadorId}")]
+        public async Task<ActionResult<Dosificador>> GetDosificador([FromRoute] Guid dosificadorId)
         {
-            return View();
-        }
+            var dosificadorExistente = await context.Dosificadores.FirstOrDefaultAsync(d => d.DosificadorId.Equals(dosificadorId));
 
-        // GET: DosificadorController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
+            if (dosificadorExistente == null)
+            {
+                return BadRequest($"El dosificador con id {dosificadorId} no existe");
+            }
 
-        // POST: DosificadorController/Create
+            return dosificadorExistente;
+        }
+        #endregion
+
+        #region Post
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        public async Task<ActionResult> CrearDosificador([FromBody] DosificadorCreacionDto dosificadorCreacionDto)
+        { 
+            var dosificadorExistente = await context.Dosificadores
+                .AnyAsync(d => d.NumeroRegistro.Equals(dosificadorCreacionDto.NumeroRegistro) || d.DosificadorId.Equals(dosificadorCreacionDto.DosificadorId));
 
-        // GET: DosificadorController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+            if(dosificadorExistente)
+            {
+                return BadRequest($"Ya existe un dosificador con el mismo id {dosificadorCreacionDto.DosificadorId} o con el mismo número de registro {dosificadorCreacionDto.NumeroRegistro}");
+            }
 
-        // POST: DosificadorController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+            var dosificador = mapper.Map<Dosificador>(dosificadorCreacionDto);
 
-        // GET: DosificadorController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
+            context.Add(dosificador);
+            await context.SaveChangesAsync();
+            return Ok();
         }
+        #endregion
 
-        // POST: DosificadorController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
     }
 }

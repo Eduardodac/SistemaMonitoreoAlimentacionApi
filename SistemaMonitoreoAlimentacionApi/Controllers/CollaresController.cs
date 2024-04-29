@@ -45,7 +45,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         #endregion
 
         #region Post
-        [HttpPost("crear")]
+        [HttpPost]
         public async Task<ActionResult> CrearCollar(CollarCreacionDto collarCreacionDto)
         { 
             var collarIdExistente = await context.Collares.AnyAsync(c => c.CollarId.Equals(collarCreacionDto.CollarId));
