@@ -1,83 +1,42 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SistemaMonitoreoAlimentacionApi.Entidades;
 
 namespace SistemaMonitoreoAlimentacionApi.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class DiasdelaSemanaController : Controller
     {
-        // GET: DiadelaSemanaController
-        public ActionResult Index()
-        {
-            return View();
-        }
+        private readonly ApplicationDbContext context;
 
-        // GET: DiadelaSemanaController/Details/5
-        public ActionResult Details(int id)
+        public DiasdelaSemanaController(ApplicationDbContext context) 
         {
-            return View();
+            this.context = context;
         }
-
-        // GET: DiadelaSemanaController/Create
-        public ActionResult Create()
+        #region Get
+        [HttpGet]
+        public async Task<ActionResult<List<DiadelaSemana>>> GetDiasdelaSemana ()
         {
-            return View();
+            return await context.DiadelaSemana.ToListAsync();
         }
+        #endregion
 
-        // POST: DiadelaSemanaController/Create
+        #region POST
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> NuevoDiadelaSemana([FromBody] DiadelaSemana diadelaSemana)
         {
-            try
+            var diadelaSemanaItem = new DiadelaSemana
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+                Dia = diadelaSemana.Dia
+            };
 
-        // GET: DiadelaSemanaController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
+            context.Add(diadelaSemanaItem);
+            await context.SaveChangesAsync();
+            return Ok();
         }
+        #endregion
 
-        // POST: DiadelaSemanaController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: DiadelaSemanaController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: DiadelaSemanaController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
     }
 }
