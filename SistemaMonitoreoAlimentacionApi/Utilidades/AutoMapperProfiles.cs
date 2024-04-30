@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SistemaMonitoreoAlimentacionApi.Dtos.Aviso;
 using SistemaMonitoreoAlimentacionApi.Dtos.Collar;
 using SistemaMonitoreoAlimentacionApi.Dtos.Dosificador;
 using SistemaMonitoreoAlimentacionApi.Dtos.Gato;
@@ -17,6 +18,10 @@ namespace SistemaMonitoreoAlimentacionApi.Utilidades
             CreateMap<DosificadorCreacionDto, Dosificador>();
             CreateMap<HorarioDto, Horario>().ReverseMap();
             CreateMap<NuevoRegistroDto, Registro>();
+
+            CreateMap<NuevoAvisoDto, Aviso>();
+            CreateMap<ModificarAvisoDto, Aviso>();
+
         }
     }
 }

@@ -1,83 +1,109 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SistemaMonitoreoAlimentacionApi.Dtos.Aviso;
+using SistemaMonitoreoAlimentacionApi.Entidades;
 
 namespace SistemaMonitoreoAlimentacionApi.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class AvisosController : Controller
     {
-        // GET: AvisoController
-        public ActionResult Index()
+        private readonly ApplicationDbContext context;
+        private readonly IMapper mapper;
+
+        public AvisosController(ApplicationDbContext context, IMapper mapper)
         {
-            return View();
+            this.context = context;
+            this.mapper = mapper;
         }
 
-        // GET: AvisoController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
+        #region Get
+        [HttpGet("{usuarioId}")]
+        public async Task<ActionResult<Aviso>> GetAviso([FromRoute] Guid usuarioId) 
+        { 
+            var aviso = await context.Avisos.FirstOrDefaultAsync(a => a.UsuarioId == usuarioId);
 
-        // GET: AvisoController/Create
-        public ActionResult Create()
-        {
-            return View();
+            if(aviso == null)
+            {
+                return NotFound($"Los avisos del usuario con id {usuarioId} no existen");
+            }
+            return Ok();
         }
-
-        // POST: AvisoController/Create
+        #endregion
+        #region Post
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> NuevoAviso([FromBody] NuevoAvisoDto nuevoAvisoDto) 
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
+            var avisoExistente = await context.Avisos.AnyAsync(a => a.AvisoId.Equals(nuevoAvisoDto.AvisoId));
+            if (avisoExistente == true) {
+                return BadRequest($"El aviso con id {nuevoAvisoDto.AvisoId} ya existe");
             }
-            catch
+
+            var aviso = mapper.Map<Aviso>(avisoExistente);
+
+            context.Add(aviso);
+            await context.SaveChangesAsync();
+
+            return Ok();
+        }
+        #endregion
+        #region Put
+        [HttpPut("{avisoId}")]
+        public async Task<ActionResult> NuevoAviso([FromRoute] Guid avisoId,[FromBody] ModificarAvisoDto modificarAvisoDto)
+        {
+            var avisoExistente = await context.Avisos.FirstOrDefaultAsync(a => a.AvisoId.Equals(avisoId));
+            if (avisoExistente == null)
             {
-                return View();
+                return BadRequest($"El aviso con id {avisoId} no existe");
             }
+
+            if(modificarAvisoDto.LimpiarPlato != new DateTime(2000, 1, 1))
+            {
+                avisoExistente.LimpiarPlato = modificarAvisoDto.LimpiarPlato;
+            }
+
+            if (modificarAvisoDto.Caducidad != new DateTime(2000, 1, 1))
+            {
+                avisoExistente.Caducidad = modificarAvisoDto.Caducidad;
+            }
+
+            if (modificarAvisoDto.LimpiarContenedor != new DateTime(2000, 1, 1))
+            {
+                avisoExistente.LimpiarContenedor = modificarAvisoDto.LimpiarContenedor;
+            }
+
+            context.Update(avisoExistente);
+            await context.SaveChangesAsync();
+
+            return Ok();
         }
 
-        // GET: AvisoController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpPut("disponibilidad/{dosificadorId}")]
+        public async Task<ActionResult> DisponibilidadAlimento([FromRoute] Guid dosificadorId, [FromBody] DisponibilidadAvisoDto disponibilidadAvisoDto)
         {
-            return View();
-        }
+            var usuarioExistente = await context.Usuarios.FirstOrDefaultAsync(u => u.DosificadorId == dosificadorId);
 
-        // POST: AvisoController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
+            if (usuarioExistente == null)
             {
-                return RedirectToAction(nameof(Index));
+                return BadRequest($"El dosificador con id {dosificadorId} no está asignado");
             }
-            catch
-            {
-                return View();
-            }
-        }
 
-        // GET: AvisoController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+            var avisoExistente = await context.Avisos.FirstOrDefaultAsync(a => a.UsuarioId == usuarioExistente.UsuarioId);
+            if (avisoExistente == null)
+            {
+                return BadRequest($"El usuario con id {usuarioExistente.UsuarioId} no tiene avisos");
+            }
 
-        // POST: AvisoController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            avisoExistente.AlimentoDisponible = disponibilidadAvisoDto.AlimentoDisponible;
+
+            context.Update(avisoExistente);
+            await context.SaveChangesAsync();
+
+            return Ok();
         }
+        #endregion
     }
 }
