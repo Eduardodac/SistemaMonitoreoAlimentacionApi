@@ -117,11 +117,21 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
                 return BadRequest($"El collar con número de registro {modificarCollarDto.NumeroRegistro} no existe");
             }
 
+            if (collarExistente.EstatusActivacion)
+            {
+                return BadRequest($"El collar con número de registro {modificarCollarDto.NumeroRegistro} ya está activado");
+            }
+
             var gatoExistente = await context.Gatos.FirstOrDefaultAsync(g => g.GatoId.Equals(gatoId));
 
             if (gatoExistente == null)
             {
-                return BadRequest($"El id {gatoId} no existe");
+                return BadRequest($"El gato con id {gatoId} no existe");
+            }
+
+            if (gatoExistente.CollarId != null)
+            {
+                return BadRequest($"El gato con id {gatoId} ya tiene un collar acivado");
             }
 
 
@@ -149,11 +159,22 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
                 return BadRequest($"El id {gatoId} de gato no existe");
             }
 
+
             var collarExistente = await context.Collares.FirstOrDefaultAsync(c => c.NumeroRegistro.Equals(modificarCollarDto.NumeroRegistro));
 
             if (collarExistente == null)
             {
                 return BadRequest($"El collar con número de registro {modificarCollarDto.NumeroRegistro} no existe");
+            }
+
+            if (!collarExistente.EstatusActivacion)
+            {
+                return BadRequest($"El collar con número de registro {modificarCollarDto.NumeroRegistro} ya está desactivado");
+            }
+
+            if(gatoExistente.CollarId != collarExistente.CollarId)
+            {
+                return BadRequest($"El collar con número de registro {modificarCollarDto.NumeroRegistro} no está ligado al gato con id {gatoId}");
             }
 
             collarExistente.EstatusActivacion = false;
