@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SistemaMonitoreoAlimentacionApi.Entidades;
 
 namespace SistemaMonitoreoAlimentacionApi
@@ -11,6 +12,8 @@ namespace SistemaMonitoreoAlimentacionApi
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Dosificador>()
                 .HasOne(u => u.Usuario)
                 .WithOne(d => d.Dosificador)
@@ -26,7 +29,7 @@ namespace SistemaMonitoreoAlimentacionApi
                 .WithOne(u => u.Usuario)
                 .HasForeignKey<Aviso>(a => a.AvisoId);
 
-            base.OnModelCreating(modelBuilder);
+            
         }
 
         public DbSet<Usuario> Usuarios { get; set; }

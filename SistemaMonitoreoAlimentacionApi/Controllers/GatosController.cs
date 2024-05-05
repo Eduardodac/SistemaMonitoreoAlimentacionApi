@@ -35,7 +35,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
             if(gato == null)
             {
-                return new NotFoundResult();
+                return NotFound($"El gato con id {gatoId} no existe");
             }
 
             return gato;
@@ -47,7 +47,13 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         [HttpPost]
         public async Task<ActionResult> PostGato([FromBody] GatoCreacionDto gatoCreacionDto)
         {
+            var gatoIdExistente = await context.Gatos.AnyAsync(x => x.GatoId == gatoCreacionDto.GatoId);
             var existeMismoGato = await context.Gatos.FirstOrDefaultAsync(x => x.Nombre == gatoCreacionDto.Nombre);
+
+            if(gatoIdExistente)
+            {
+                return BadRequest($"Ya existe un gato con la misma Id {gatoCreacionDto.GatoId}");
+            }
 
             if(existeMismoGato != null)
             {
@@ -67,6 +73,41 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         #endregion
 
         #region Put
+        [HttpPut("{gatoId}")]
+        public async Task<ActionResult> ModificarGato([FromRoute] Guid gatoId, [FromBody] ModificarGatoDto modificarGatoDto)
+        {
+            var gatoExistente = await context.Gatos.FirstOrDefaultAsync(g => g.GatoId.Equals(gatoId));
+
+            if (gatoExistente == null)
+            {
+                return BadRequest($"El id {gatoId} no existe");
+            }
+
+            if(modificarGatoDto.Nombre != null && modificarGatoDto.Nombre != "")
+            {
+                gatoExistente.Nombre = modificarGatoDto.Nombre;
+            }
+
+            if (modificarGatoDto.Raza != null && modificarGatoDto.Raza != "")
+            {
+                gatoExistente.Raza = modificarGatoDto.Raza;
+            }
+
+            if (modificarGatoDto.Sexo != null && modificarGatoDto.Sexo != "")
+            {
+                gatoExistente.Sexo = modificarGatoDto.Sexo;
+            }
+
+            if (modificarGatoDto.Edad != null && modificarGatoDto.Edad < 0)
+            {
+                gatoExistente.Edad = modificarGatoDto.Edad;
+            }
+
+            context.Update(gatoExistente);
+            await context.SaveChangesAsync();
+
+            return Ok();
+        }
         [HttpPut("activarCollar/{gatoId}")]
         public async Task<ActionResult> ActivarCollar([FromRoute] Guid gatoId, [FromBody] ModificarCollarDto modificarCollarDto)
         {
@@ -131,5 +172,6 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
 
             #endregion
-        }
+        
+    }
 }
