@@ -22,7 +22,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
         #region Get
         [HttpGet("{usuarioId}")]
-        public async Task<ActionResult<List<HorarioDto>>> ListaHorarios([FromRoute] Guid usuarioId)
+        public async Task<ActionResult<List<HorarioCrearDto>>> ListaHorarios([FromRoute] Guid usuarioId)
         { 
             var usuarioExistente = await context.Usuarios.FirstOrDefaultAsync(u => u.UsuarioId.Equals(usuarioId));
 
@@ -33,7 +33,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
             var horarios = await context.Horarios.Where(h => h.UsuarioId == usuarioId).ToListAsync();
 
-            var HorariosDto = mapper.Map<List<Horario>, List<HorarioDto>>(horarios);
+            var HorariosDto = mapper.Map<List<Horario>, List<HorarioCrearDto>>(horarios);
 
             return HorariosDto;
         }
@@ -59,6 +59,42 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
             context.Add(horario);
             await context.SaveChangesAsync();
+            return Ok();
+        }
+        #endregion
+
+        #region Put
+        [HttpPut("{horarioId}")]
+        public async Task<ActionResult> ModificarHorario([FromRoute] Guid horarioId, [FromBody] HorarioModificarDto horarioModificarDto)
+        { 
+            var horarioExistente = await context.Horarios.FirstOrDefaultAsync(h => h.HorarioId == horarioId);
+
+            if (horarioExistente == null)
+            {
+                return BadRequest($"El horario con id {horarioId} no existe");
+            }
+
+            var diadelaSemanaExistente = await context.DiadelaSemana.AnyAsync(d => d.DiadelaSemanaId == horarioModificarDto.DiaDeLaSemanaId);
+
+            if (horarioModificarDto.DiaDeLaSemanaId != null)
+            {
+                if (!diadelaSemanaExistente)
+                {
+                    return NotFound($"El Dia de la semana con id {horarioModificarDto.DiaDeLaSemanaId} no existe");
+                }
+                else {
+                    horarioExistente.DiaDeLaSemanaId = (int)horarioModificarDto.DiaDeLaSemanaId;
+                }
+            }
+
+            if(horarioModificarDto.Hora != null)
+            {
+                horarioExistente.Hora = (DateTime)horarioModificarDto.Hora;
+            }
+
+            context.Update(horarioExistente);
+            await context.SaveChangesAsync();
+            
             return Ok();
         }
         #endregion
