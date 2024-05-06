@@ -24,7 +24,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         [HttpGet("{usuarioId}")]
         public async Task<ActionResult<List<HorarioCrearDto>>> ListaHorarios([FromRoute] Guid usuarioId)
         { 
-            var usuarioExistente = await context.Usuarios.FirstOrDefaultAsync(u => u.UsuarioId.Equals(usuarioId));
+            var usuarioExistente = await context.Users.FirstOrDefaultAsync(u => u.Id.Equals(usuarioId));
 
             if(usuarioExistente == null)
             {
@@ -43,7 +43,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         [HttpPost]
         public async Task<ActionResult<List<Horario>>> CrearHorarios([FromBody] Horario horario)
         {
-            var usuarioExistente = await context.Usuarios.AnyAsync(u => u.UsuarioId.Equals(horario.UsuarioId));
+            var usuarioExistente = await context.Users.AnyAsync(u => u.Id.Equals(horario.UsuarioId));
 
             if (!usuarioExistente)
             {

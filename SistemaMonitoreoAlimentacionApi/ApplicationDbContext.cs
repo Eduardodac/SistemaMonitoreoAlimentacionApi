@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SistemaMonitoreoAlimentacionApi.Entidades;
 
 namespace SistemaMonitoreoAlimentacionApi
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<Usuario, IdentityRole<Guid>, Guid>
     {
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
@@ -29,10 +30,9 @@ namespace SistemaMonitoreoAlimentacionApi
                 .WithOne(u => u.Usuario)
                 .HasForeignKey<Aviso>(a => a.AvisoId);
 
-            
+
         }
 
-        public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Dosificador> Dosificadores { get; set; }
         public DbSet<Gato> Gatos { get; set; }
         public DbSet<Collar> Collares { get; set; }

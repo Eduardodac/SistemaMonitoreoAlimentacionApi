@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using SistemaMonitoreoAlimentacionApi.Entidades;
 using System.Text.Json.Serialization;
 
 namespace SistemaMonitoreoAlimentacionApi
@@ -19,6 +22,8 @@ namespace SistemaMonitoreoAlimentacionApi
             services.AddDbContext<ApplicationDbContext>(options => 
             options.UseSqlServer(Configuration.GetConnectionString("defaultConnection")));
 
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
@@ -31,6 +36,10 @@ namespace SistemaMonitoreoAlimentacionApi
             });
 
             services.AddAutoMapper(typeof(Startup));
+
+            services.AddIdentity<Usuario, IdentityRole<Guid>>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

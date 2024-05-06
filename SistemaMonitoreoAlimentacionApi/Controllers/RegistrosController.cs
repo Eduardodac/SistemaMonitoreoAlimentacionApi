@@ -47,7 +47,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
                 return NotFound($"Este collar con id {nuevoRegistroDto.CollarId} no está asignado");
             }
 
-            var usuarioAsignado = await context.Usuarios.FirstOrDefaultAsync(g => g.DosificadorId.Equals(nuevoRegistroDto.DosificadorId));
+            var usuarioAsignado = await context.Users.FirstOrDefaultAsync(g => g.DosificadorId.Equals(nuevoRegistroDto.DosificadorId));
 
             if (usuarioAsignado == null)
             {

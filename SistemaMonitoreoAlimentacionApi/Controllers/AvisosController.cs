@@ -84,17 +84,17 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         [HttpPut("disponibilidad/{dosificadorId}")]
         public async Task<ActionResult> DisponibilidadAlimento([FromRoute] Guid dosificadorId, [FromBody] DisponibilidadAvisoDto disponibilidadAvisoDto)
         {
-            var usuarioExistente = await context.Usuarios.FirstOrDefaultAsync(u => u.DosificadorId == dosificadorId);
+            var usuarioExistente = await context.Users.FirstOrDefaultAsync(u => u.DosificadorId == dosificadorId);
 
             if (usuarioExistente == null)
             {
                 return BadRequest($"El dosificador con id {dosificadorId} no está asignado");
             }
 
-            var avisoExistente = await context.Avisos.FirstOrDefaultAsync(a => a.UsuarioId == usuarioExistente.UsuarioId);
+            var avisoExistente = await context.Avisos.FirstOrDefaultAsync(a => a.UsuarioId == usuarioExistente.Id);
             if (avisoExistente == null)
             {
-                return BadRequest($"El usuario con id {usuarioExistente.UsuarioId} no tiene avisos");
+                return BadRequest($"El usuario con id {usuarioExistente.Id} no tiene avisos");
             }
 
             avisoExistente.AlimentoDisponible = disponibilidadAvisoDto.AlimentoDisponible;
