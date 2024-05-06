@@ -50,11 +50,29 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
                 return NotFound($"El usuario con id {horario.UsuarioId} no existe");
             }
 
+            var horarioExistente = await context.Horarios.AnyAsync(h => h.HorarioId.Equals(horario.HorarioId));
+
+            if (horarioExistente)
+            {
+                return NotFound($"El horario con id {horario.HorarioId} ya existe");
+            }
+
             var diadelaSemanaExistente = await context.DiadelaSemana.AnyAsync(d => d.DiadelaSemanaId == horario.DiaDeLaSemanaId);
 
             if (!diadelaSemanaExistente)
             {
                 return NotFound($"El Dia de la semana con id {horario.DiaDeLaSemanaId} no existe");
+            }
+
+            var listaHorarios = await context.Horarios.Where(h => h.UsuarioId == horario.UsuarioId && h.DiaDeLaSemanaId == horario.DiaDeLaSemanaId).Select(h=>h.Hora).ToListAsync();
+
+            TimeSpan mediaHora = TimeSpan.FromMinutes(30);//tiempo mínimo de intervalo
+
+            bool comparacionMediaHoraDiferencia = listaHorarios.Any(hora => Math.Abs((horario.Hora - hora).Ticks) < mediaHora.Ticks);
+
+            if (comparacionMediaHoraDiferencia)
+            {
+                return BadRequest($"La hora ingresada {horario.Hora} no tiene más de media hora de diferencia con otros del mismo día");
             }
 
             context.Add(horario);
@@ -90,6 +108,21 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             if(horarioModificarDto.Hora != null)
             {
                 horarioExistente.Hora = (DateTime)horarioModificarDto.Hora;
+            }
+
+            var listaHorarios = await context.Horarios
+                .Where(h => h.UsuarioId == horarioExistente.UsuarioId 
+                        && h.DiaDeLaSemanaId == horarioExistente.DiaDeLaSemanaId
+                        && h.HorarioId != horarioExistente.HorarioId)
+                .Select(h => h.Hora).ToListAsync();
+
+            TimeSpan mediaHora = TimeSpan.FromMinutes(30);//tiempo mínimo de intervalo
+
+            bool comparacionMediaHoraDiferencia = listaHorarios.Any(hora => Math.Abs((horarioExistente.Hora - hora).Ticks) < mediaHora.Ticks);
+
+            if (comparacionMediaHoraDiferencia)
+            {
+                return BadRequest($"La hora ingresada {horarioExistente.Hora} no tiene más de media hora de diferencia con otros del mismo día");
             }
 
             context.Update(horarioExistente);
