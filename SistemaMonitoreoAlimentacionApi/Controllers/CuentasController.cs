@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SistemaMonitoreoAlimentacionApi.Dtos.Cuentas;
+using SistemaMonitoreoAlimentacionApi.Dtos.Gato;
+using SistemaMonitoreoAlimentacionApi.Dtos.Usuario;
 using SistemaMonitoreoAlimentacionApi.Entidades;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -19,31 +22,34 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         private readonly UserManager<Usuario> userManager;
         private readonly IConfiguration configuration;
         private readonly SignInManager<Usuario> signInManager;
+        private readonly IMapper mapper;
 
         public CuentasController(ApplicationDbContext context, 
             UserManager<Usuario> userManager, 
             IConfiguration configuration,
-            SignInManager<Usuario> signInManager)
+            SignInManager<Usuario> signInManager,
+            IMapper mapper)
         {
             this.context = context;
             this.userManager = userManager;
             this.configuration = configuration;
             this.signInManager = signInManager;
+            this.mapper = mapper;
         }
 
-        #region Post
+        #region Registrar
         [HttpPost("registrar")]
-        public async Task<ActionResult<RespuestaAutenticacion>> Registrar(CredencialesUsuario credencialesUsuario)
+        public async Task<ActionResult<RespuestaAutenticacion>> Registrar(NuevoUsuario nuevoUsuario)
         {
             var Usuario = new Usuario {
-                UserName = credencialesUsuario.Email,
-                Email = credencialesUsuario.Email
+                UserName = nuevoUsuario.UserName,
+                Email = nuevoUsuario.Email
             };
-            var resultado = await userManager.CreateAsync(Usuario, credencialesUsuario.Password);
+            var resultado = await userManager.CreateAsync(Usuario, nuevoUsuario.Password);
 
             if(resultado.Succeeded)
             {
-                return ConstruirToken(credencialesUsuario);
+                return ConstruirToken(new CredencialesUsuario { Username = nuevoUsuario.UserName, Password = nuevoUsuario.Password });
             }
             else
             {
@@ -56,7 +62,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<RespuestaAutenticacion>> Login(CredencialesUsuario credencialesUsuario)
         {
-            var resultado = await signInManager.PasswordSignInAsync(credencialesUsuario.Email,
+            var resultado = await signInManager.PasswordSignInAsync(credencialesUsuario.Username,
                 credencialesUsuario.Password,
                 isPersistent: false,
                 lockoutOnFailure: false);
@@ -77,11 +83,11 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public ActionResult<RespuestaAutenticacion> Renovar()
         {
-            var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
-            var email = emailClaim != null ? emailClaim.Value : "";
+            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
+            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
             var credencialesUsuario = new CredencialesUsuario()
             {
-                Email = email
+                Username = Username
             };
 
             return ConstruirToken(credencialesUsuario);
@@ -89,11 +95,62 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         }
         #endregion
 
+        #region CambioPassword
+        [HttpPut("cambiarPassword")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<RespuestaAutenticacion>> CambiarPasswordAsync([FromBody] PasswordChange password)
+        {
+            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
+            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
+
+            var userExistente = await userManager.FindByNameAsync(password.username);
+            if (Username != userExistente.UserName)
+            {
+                return Forbid();
+            }
+
+
+            if(userExistente != null)
+            {
+                var cambioResult = await userManager.ChangePasswordAsync(userExistente, password.OldPassword, password.NewPassword);
+                if (cambioResult.Succeeded)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return BadRequest(cambioResult.Errors);
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
+            
+
+        }
+        #endregion
+
+        #region getInfo
+        [HttpGet("usuario")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<UsuarioModificarDto>> GetInfo()
+        {
+            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
+            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
+            var usuario = await userManager.FindByNameAsync(Username);
+
+            var userDto = mapper.Map<UsuarioModificarDto>(usuario);
+
+            return userDto;
+        }
+        #endregion
+
         private RespuestaAutenticacion ConstruirToken(CredencialesUsuario credencialesUsuario)
         {
             var claims = new List<Claim>()
             {
-                new Claim("email", credencialesUsuario.Email)
+                new Claim("username", credencialesUsuario.Username)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["keyJwt"]));

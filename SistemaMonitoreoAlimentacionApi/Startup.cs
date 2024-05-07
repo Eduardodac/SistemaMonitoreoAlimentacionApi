@@ -81,6 +81,8 @@ namespace SistemaMonitoreoAlimentacionApi
             services.AddIdentity<Usuario, IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.AddDataProtection();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
