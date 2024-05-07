@@ -15,8 +15,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         public UsuariosController(ApplicationDbContext context)
         {
             this.context = context;
-        }
-
+        } 
         //#region Get
         //[HttpGet]
         //public async Task<ActionResult<List<Usuario>>> GetUsuarios()
