@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaMonitoreoAlimentacionApi.Dtos.Collar;
@@ -10,14 +13,17 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class GatosController : ControllerBase
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
+        private readonly UserManager<Usuario> userManager;
 
-        public GatosController(ApplicationDbContext context, IMapper mapper) { 
+        public GatosController(ApplicationDbContext context, IMapper mapper, UserManager<Usuario> userManager) { 
             this.context = context;
             this.mapper = mapper;
+            this.userManager = userManager;
         }
 
         #region Get
@@ -44,15 +50,19 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         #endregion
 
         #region Post
-        [HttpPost]
-        public async Task<ActionResult> PostGato([FromBody] GatoCreacionDto gatoCreacionDto)
+        [HttpPost("{gatoId}")]
+        public async Task<ActionResult> PostGato([FromRoute] Guid gatoId, [FromBody] GatoCreacionDto gatoCreacionDto)
         {
-            var gatoIdExistente = await context.Gatos.AnyAsync(x => x.GatoId == gatoCreacionDto.GatoId);
+            var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
+            var email = emailClaim != null? emailClaim.Value: "";
+            var usuario = await userManager.FindByEmailAsync(email);
+
+            var gatoIdExistente = await context.Gatos.AnyAsync(x => x.GatoId == gatoId);
             var existeMismoGato = await context.Gatos.FirstOrDefaultAsync(x => x.Nombre == gatoCreacionDto.Nombre);
 
             if(gatoIdExistente)
             {
-                return BadRequest($"Ya existe un gato con la misma Id {gatoCreacionDto.GatoId}");
+                return BadRequest($"Ya existe un gato con la misma Id {gatoId}");
             }
 
             if(existeMismoGato != null)
@@ -64,6 +74,8 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             }
 
             var gato = mapper.Map<Gato>(gatoCreacionDto);
+            gato.GatoId = gatoId;
+            gato.UsuarioId = usuario.Id;
 
             context.Gatos.Add(gato);
             await context.SaveChangesAsync();
