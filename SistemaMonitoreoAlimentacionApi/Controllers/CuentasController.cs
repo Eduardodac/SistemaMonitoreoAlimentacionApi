@@ -134,15 +134,52 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         #region getInfo
         [HttpGet("usuario")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<UsuarioModificarDto>> GetInfo()
+        public async Task<ActionResult<ModificarUsuario>> GetInfo()
         {
             var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
             var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
             var usuario = await userManager.FindByNameAsync(Username);
 
-            var userDto = mapper.Map<UsuarioModificarDto>(usuario);
+            var userDto = mapper.Map<ModificarUsuario>(usuario);
 
             return userDto;
+        }
+        #endregion
+
+        #region Put Users
+        [HttpPut("modificarUsuario")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult> ModificarUsuario([FromBody] ModificarUsuario modificar)
+        {
+            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
+            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
+            var usuario = await userManager.FindByNameAsync(Username);
+
+            if(modificar.Nombre != null && modificar.Nombre !="")
+            {
+                usuario.Nombre = modificar.Nombre;
+            }
+
+            if (modificar.ApellidoMaterno != null && modificar.ApellidoMaterno != "")
+            {
+                usuario.ApellidoMaterno = modificar.ApellidoMaterno;
+            }
+
+            if (modificar.ApellidoPaterno != null && modificar.ApellidoPaterno != "")
+            {
+                usuario.ApellidoPaterno = modificar.ApellidoPaterno;
+            }
+
+            var result = await userManager.UpdateAsync(usuario);
+            if(result.Succeeded)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return BadRequest(result.Errors);
+            }
+
         }
         #endregion
 
