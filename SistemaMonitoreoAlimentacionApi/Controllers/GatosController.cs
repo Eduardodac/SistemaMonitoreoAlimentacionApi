@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaMonitoreoAlimentacionApi.Dtos.Collar;
 using SistemaMonitoreoAlimentacionApi.Dtos.Gato;
+using SistemaMonitoreoAlimentacionApi.Dtos.Horario;
 using SistemaMonitoreoAlimentacionApi.Entidades;
 
 namespace SistemaMonitoreoAlimentacionApi.Controllers
@@ -28,9 +29,17 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
         #region Get
         [HttpGet]
-        public async Task<ActionResult<List<Gato>>> GetGatos() 
-        { 
-            return await context.Gatos.ToListAsync();
+        public async Task<ActionResult<List<GatoEntidadDto>>> GetGatos() 
+        {
+            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
+            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
+            var usuario = await userManager.FindByNameAsync(Username);
+
+            var gatos = await context.Gatos.Where(h => h.UsuarioId == usuario.Id).ToListAsync();
+
+            var gatosDto = mapper.Map<List<Gato>, List<GatoEntidadDto>>(gatos);
+
+            return gatosDto;
         }
 
         [HttpGet("{gatoId}")]
@@ -51,14 +60,14 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
         #region Post
         [HttpPost("{gatoId}")]
-        public async Task<ActionResult> PostGato([FromRoute] Guid gatoId, [FromBody] GatoCreacionDto gatoCreacionDto)
+        public async Task<ActionResult> PostGato([FromRoute] Guid gatoId, [FromBody] GatoEntidadDto gatoEntidad)
         {
-            var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
-            var email = emailClaim != null? emailClaim.Value: "";
-            var usuario = await userManager.FindByEmailAsync(email);
+            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
+            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
+            var usuario = await userManager.FindByNameAsync(Username);
 
             var gatoIdExistente = await context.Gatos.AnyAsync(x => x.GatoId == gatoId);
-            var existeMismoGato = await context.Gatos.FirstOrDefaultAsync(x => x.Nombre == gatoCreacionDto.Nombre);
+            var existeMismoGato = await context.Gatos.FirstOrDefaultAsync(x => x.Nombre == gatoEntidad.Nombre);
 
             if(gatoIdExistente)
             {
@@ -67,13 +76,13 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
             if(existeMismoGato != null)
             {
-                if(existeMismoGato.Raza == gatoCreacionDto.Raza) 
+                if(existeMismoGato.Raza == gatoEntidad.Raza) 
                 {
-                    return BadRequest($"Ya existe un gato con el mismo nombre {gatoCreacionDto.Nombre} y con la misma raza {gatoCreacionDto.Raza}");
+                    return BadRequest($"Ya existe un gato con el mismo nombre {gatoEntidad.Nombre} y con la misma raza {gatoEntidad.Raza}");
                 }
             }
 
-            var gato = mapper.Map<Gato>(gatoCreacionDto);
+            var gato = mapper.Map<Gato>(gatoEntidad);
             gato.GatoId = gatoId;
             gato.UsuarioId = usuario.Id;
 
@@ -88,6 +97,10 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         [HttpPut("{gatoId}")]
         public async Task<ActionResult> ModificarGato([FromRoute] Guid gatoId, [FromBody] ModificarGatoDto modificarGatoDto)
         {
+            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
+            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
+            var usuario = await userManager.FindByNameAsync(Username);
+
             var gatoExistente = await context.Gatos.FirstOrDefaultAsync(g => g.GatoId.Equals(gatoId));
 
             if (gatoExistente == null)
@@ -95,7 +108,12 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
                 return BadRequest($"El id {gatoId} no existe");
             }
 
-            if(modificarGatoDto.Nombre != null && modificarGatoDto.Nombre != "")
+            if (gatoExistente.UsuarioId != usuario.Id)
+            {
+                return Forbid($"No tienes permisos de modificacion");
+            }
+
+            if (modificarGatoDto.Nombre != null && modificarGatoDto.Nombre != "")
             {
                 gatoExistente.Nombre = modificarGatoDto.Nombre;
             }

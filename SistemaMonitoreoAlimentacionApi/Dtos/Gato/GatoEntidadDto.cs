@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SistemaMonitoreoAlimentacionApi.Dtos.Gato
 {
-    public class GatoCreacionDto
+    public class GatoEntidadDto
     {
         public string? Nombre { get; set; }
         public string? Raza { get; set; }
