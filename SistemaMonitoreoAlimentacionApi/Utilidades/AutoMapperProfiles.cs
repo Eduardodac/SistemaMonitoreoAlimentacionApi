@@ -17,7 +17,7 @@ namespace SistemaMonitoreoAlimentacionApi.Utilidades
             CreateMap<GatoCreacionDto, Gato>();
             CreateMap<CollarCreacionDto, Collar>();
             CreateMap<DosificadorCreacionDto, Dosificador>();
-            CreateMap<HorarioCrearDto, Horario>().ReverseMap();
+            CreateMap<HorarioEntidadDto, Horario>().ReverseMap();
             CreateMap<NuevoRegistroDto, Registro>();
 
             CreateMap<NuevoAvisoDto, Aviso>();
