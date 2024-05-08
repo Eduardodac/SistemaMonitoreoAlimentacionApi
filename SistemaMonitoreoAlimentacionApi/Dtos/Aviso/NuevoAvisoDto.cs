@@ -5,7 +5,6 @@ namespace SistemaMonitoreoAlimentacionApi.Dtos.Aviso
     public class NuevoAvisoDto
     {
         public Guid AvisoId { get; set; } = Guid.Empty!;
-        public Guid UsuarioId { get; set; } = Guid.Empty!;
         [Required]
         public DateTime LimpiarContenedor { get; set; } = DateTime.Now;
         [Required]
