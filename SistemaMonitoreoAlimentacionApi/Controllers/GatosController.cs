@@ -9,6 +9,8 @@ using SistemaMonitoreoAlimentacionApi.Dtos.Collar;
 using SistemaMonitoreoAlimentacionApi.Dtos.Gato;
 using SistemaMonitoreoAlimentacionApi.Dtos.Horario;
 using SistemaMonitoreoAlimentacionApi.Entidades;
+using SistemaMonitoreoAlimentacionApi.Servicios;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace SistemaMonitoreoAlimentacionApi.Controllers
 {
@@ -20,11 +22,17 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
         private readonly UserManager<Usuario> userManager;
+        private readonly IAlmacenadorArchivos almacenadorArchivos;
+        private readonly string contenedor = "gatos";
 
-        public GatosController(ApplicationDbContext context, IMapper mapper, UserManager<Usuario> userManager) { 
+        public GatosController(ApplicationDbContext context, 
+            IMapper mapper, 
+            UserManager<Usuario> userManager,
+            IAlmacenadorArchivos almacenadorArchivos) { 
             this.context = context;
             this.mapper = mapper;
             this.userManager = userManager;
+            this.almacenadorArchivos = almacenadorArchivos;
         }
 
         #region Get
@@ -138,6 +146,39 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
             return Ok();
         }
+
+        [HttpPut("imagen/{gatoId}")]
+        public async Task<ActionResult> ModificarImagenGato([FromRoute] Guid gatoId, [FromForm] ModificarImagenGatoDto imagen)
+        {
+            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
+            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
+            var usuario = await userManager.FindByNameAsync(Username);
+
+            var gatoExistente = await context.Gatos.FirstOrDefaultAsync(g => g.GatoId.Equals(gatoId));
+
+            if (gatoExistente == null)
+            {
+                return BadRequest($"El id {gatoId} no existe");
+            }
+
+            if (gatoExistente.UsuarioId != usuario.Id)
+            {
+                return Forbid($"No tienes permisos de modificacion");
+            }
+
+            using (var memoryStream = new MemoryStream())
+            { 
+                await imagen.Imagen.CopyToAsync(memoryStream);
+                var contenido = memoryStream.ToArray();
+                var extension = Path.GetExtension(imagen.Imagen.FileName);
+                gatoExistente.ImagenGato = await almacenadorArchivos.EditarArchivo(contenido, extension, contenedor, gatoExistente.ImagenGato, imagen.Imagen.ContentType);
+            }
+
+            context.Update(gatoExistente);
+            await context.SaveChangesAsync();
+
+            return Ok();
+        }
         [HttpPut("activarCollar/{gatoId}")]
         public async Task<ActionResult> ActivarCollar([FromRoute] Guid gatoId, [FromBody] ModificarCollarDto modificarCollarDto)
         {
@@ -189,7 +230,6 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
                 return BadRequest($"El id {gatoId} de gato no existe");
             }
 
-
             var collarExistente = await context.Collares.FirstOrDefaultAsync(c => c.NumeroRegistro.Equals(modificarCollarDto.NumeroRegistro));
 
             if (collarExistente == null)
@@ -219,8 +259,6 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
             return Ok();
         }
-
-
 
             #endregion
         
