@@ -8,6 +8,7 @@ using SistemaMonitoreoAlimentacionApi.Dtos.Cuentas;
 using SistemaMonitoreoAlimentacionApi.Dtos.Gato;
 using SistemaMonitoreoAlimentacionApi.Dtos.Usuario;
 using SistemaMonitoreoAlimentacionApi.Entidades;
+using SistemaMonitoreoAlimentacionApi.Servicios;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -23,18 +24,22 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         private readonly IConfiguration configuration;
         private readonly SignInManager<Usuario> signInManager;
         private readonly IMapper mapper;
+        private readonly IAlmacenadorArchivos almacenadorArchivos;
+        private readonly string contenedor = "usuarios";
 
         public CuentasController(ApplicationDbContext context, 
             UserManager<Usuario> userManager, 
             IConfiguration configuration,
             SignInManager<Usuario> signInManager,
-            IMapper mapper)
+            IMapper mapper,
+            IAlmacenadorArchivos almacenadorArchivos)
         {
             this.context = context;
             this.userManager = userManager;
             this.configuration = configuration;
             this.signInManager = signInManager;
             this.mapper = mapper;
+            this.almacenadorArchivos = almacenadorArchivos;
         }
 
         #region Registrar
@@ -180,6 +185,35 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
                 return BadRequest(result.Errors);
             }
 
+        }
+        #endregion
+
+        #region ModificarImagen
+        [HttpPut("Imagen")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<string>> Put([FromForm] ModificarImagen imagen)
+        {
+            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
+            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
+            var usuario = await userManager.FindByNameAsync(Username);
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await imagen.Imagen.CopyToAsync(memoryStream);
+                var contenido = memoryStream.ToArray();
+                var extension = Path.GetExtension(imagen.Imagen.FileName);
+                usuario.ImagenUsuario = await almacenadorArchivos.EditarArchivo(contenido, extension, contenedor, usuario.ImagenUsuario, imagen.Imagen.ContentType);
+            }
+
+            var result = await userManager.UpdateAsync(usuario);
+            if (result.Succeeded)
+            {
+                return usuario.ImagenUsuario;
+            }
+            else
+            {
+                return BadRequest(result.Errors);
+            }
         }
         #endregion
 
