@@ -139,13 +139,13 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         #region getInfo
         [HttpGet("usuario")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<ModificarUsuario>> GetInfo()
+        public async Task<ActionResult<GetUsuario>> GetInfo()
         {
             var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
             var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
             var usuario = await userManager.FindByNameAsync(Username);
 
-            var userDto = mapper.Map<ModificarUsuario>(usuario);
+            var userDto = mapper.Map<GetUsuario>(usuario);
 
             return userDto;
         }

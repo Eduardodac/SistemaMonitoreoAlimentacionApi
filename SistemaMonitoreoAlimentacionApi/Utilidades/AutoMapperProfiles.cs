@@ -24,6 +24,7 @@ namespace SistemaMonitoreoAlimentacionApi.Utilidades
             CreateMap<ModificarAvisoDto, Aviso>();
 
             CreateMap<Usuario, ModificarUsuario>();
+            CreateMap<Usuario, GetUsuario>();
 
         }
     }
