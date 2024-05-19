@@ -14,7 +14,7 @@ namespace SistemaMonitoreoAlimentacionApi.Utilidades
     {
         public AutoMapperProfiles() 
         {
-            CreateMap<GatoEntidadDto, Gato>();
+            CreateMap<GatoEntidadDto, Gato>().ReverseMap();
             CreateMap<CollarCreacionDto, Collar>();
             CreateMap<DosificadorCreacionDto, Dosificador>();
             CreateMap<HorarioEntidadDto, Horario>().ReverseMap();
