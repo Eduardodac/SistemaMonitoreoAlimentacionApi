@@ -46,21 +46,21 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
         #region Post
         [HttpPost]
-        public async Task<ActionResult> CrearCollar(CollarCreacionDto collarCreacionDto)
+        public async Task<ActionResult> CrearCollar(CollarEntidadDto collarEntidad)
         { 
-            var collarIdExistente = await context.Collares.AnyAsync(c => c.CollarId.Equals(collarCreacionDto.CollarId));
+            var collarIdExistente = await context.Collares.AnyAsync(c => c.CollarId.Equals(collarEntidad.CollarId));
             if(collarIdExistente == true)
             {
-                return BadRequest($"Ya existe un collar con el mismo Id {collarCreacionDto.CollarId}");
+                return BadRequest($"Ya existe un collar con el mismo Id {collarEntidad.CollarId}");
             }
 
-            var collarRegistroExistente = await context.Collares.AnyAsync(c => c.NumeroRegistro.Equals(collarCreacionDto.NumeroRegistro));
+            var collarRegistroExistente = await context.Collares.AnyAsync(c => c.NumeroRegistro.Equals(collarEntidad.NumeroRegistro));
             if (collarIdExistente == true)
             {
-                return BadRequest($"Ya existe un collar con el mismo Número de registro {collarCreacionDto.NumeroRegistro}");
+                return BadRequest($"Ya existe un collar con el mismo Número de registro {collarEntidad.NumeroRegistro}");
             }
 
-            var collar = mapper.Map<Collar>(collarCreacionDto);
+            var collar = mapper.Map<Collar>(collarEntidad);
 
             context.Add(collar);
             await context.SaveChangesAsync();

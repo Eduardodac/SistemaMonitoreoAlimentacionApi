@@ -43,7 +43,10 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
             var usuario = await userManager.FindByNameAsync(Username);
 
-            var gatos = await context.Gatos.Where(h => h.UsuarioId == usuario.Id).ToListAsync();
+            var gatos = await context.Gatos
+                .Include(g=>g.Collar)
+                .Where(h => h.UsuarioId == usuario.Id)
+                .ToListAsync();
 
             var gatosDto = mapper.Map<List<Gato>, List<GatoEntidadDto>>(gatos);
 
@@ -54,7 +57,9 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         public async Task<ActionResult<Gato>> GetGato([FromRoute]Guid gatoId)
         {
 
-            var gato =  await context.Gatos.FirstOrDefaultAsync(x => x.GatoId == gatoId);
+            var gato =  await context.Gatos
+                .Include(g =>g.Collar)
+                .FirstOrDefaultAsync(x => x.GatoId == gatoId);
 
             if(gato == null)
             {
@@ -177,7 +182,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             context.Update(gatoExistente);
             await context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(gatoExistente.ImagenGato);
         }
         [HttpPut("activarCollar/{gatoId}")]
         public async Task<ActionResult> ActivarCollar([FromRoute] Guid gatoId, [FromBody] ModificarCollarDto modificarCollarDto)
@@ -216,7 +221,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             context.Update(gatoExistente);
             await context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(collarExistente);
         }
 
         [HttpPut("desactivarCollar/{gatoId}")]
@@ -235,6 +240,11 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             if (collarExistente == null)
             {
                 return BadRequest($"El collar con número de registro {modificarCollarDto.NumeroRegistro} no existe");
+            }
+
+            if(gatoExistente.CollarId == null || gatoExistente.CollarId == Guid.Empty)
+            {
+                return BadRequest($"El gato con id {gatoExistente.GatoId} no tiene collar asignado");
             }
 
             if (!collarExistente.EstatusActivacion)
