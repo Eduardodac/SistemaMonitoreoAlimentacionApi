@@ -9,7 +9,7 @@ namespace SistemaMonitoreoAlimentacionApi.Servicios
         private readonly string connectionString;
         public AlmacenadorArchivoAzure(IConfiguration configuration)
         {
-            connectionString = configuration.GetConnectionString("AzureStorage");
+            connectionString = configuration["AzureStorage"];
         }
         public async Task BorrarArchivo(string ruta, string contenedor)
         {

@@ -1,0 +1,30 @@
+{
+  "dependencies": {
+    "identityapp1": {
+      "ignored": "true",
+      "type": "identityapp"
+    },
+    "mssql1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/SistemaMonitoreoAlimentacionApi/providers/Microsoft.ServiceLinker/linkers/defaultConnection_D2E55C3BC1",
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/sistemamonitoreoalimentacionapidbserver/databases/SistemaMonitoreoAlimentacionApi_db",
+      "type": "mssql.azure",
+      "connectionId": "defaultConnection",
+      "dynamicId": null
+    },
+    "appInsights1": {
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/microsoft.insights/components/SistemaMonitoreoAlimentacionApi",
+      "type": "appInsights.azure",
+      "connectionId": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+      "dynamicId": null
+    },
+    "storage1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/SistemaMonitoreoAlimentacionApi/providers/Microsoft.ServiceLinker/linkers/AzureStorage_328AA4B232, /subscriptions/f930f337-d23c-47f4-9f9a-edd82b4738d0/resourcegroups/SistemaAlimentacion/providers/Microsoft.Web/sites/SistemaMonitoreoAlimentacionApi/providers/Microsoft.ServiceLinker/linkers/AzureStorage_E1592CF5B3",
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Storage/storageAccounts/sistemaalimentacion",
+      "type": "storage.azure",
+      "connectionId": "AzureStorage"
+    }
+  }
+}

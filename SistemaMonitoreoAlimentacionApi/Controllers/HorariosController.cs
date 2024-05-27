@@ -72,7 +72,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
             if (comparacionMediaHoraDiferencia)
             {
-                return BadRequest($"La hora ingresada {horarioCrear.Hora} no tiene más de media hora de diferencia con otros del mismo día");
+                return BadRequest($"La hora ingresada {horarioCrear.Hora.Hour}:{horarioCrear.Hora.Minute} no tiene más de media hora de diferencia con otros del mismo día");
             }
 
             var horario = mapper.Map<Horario>(horarioCrear);
@@ -106,20 +106,6 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             }
 
 
-            var diadelaSemanaExistente = await context.DiadelaSemana.AnyAsync(d => d.DiadelaSemanaId == horarioModificarDto.DiaDeLaSemanaId);
-
-            if (horarioModificarDto.DiaDeLaSemanaId != null)
-            {
-                if (!diadelaSemanaExistente)
-                {
-                    return NotFound($"El Dia de la semana con id {horarioModificarDto.DiaDeLaSemanaId} no existe");
-                }
-                else
-                {
-                    horarioExistente.DiaDeLaSemanaId = (int)horarioModificarDto.DiaDeLaSemanaId;
-                }
-            }
-
             if (horarioModificarDto.Hora != null)
             {
                 horarioExistente.Hora = (DateTime)horarioModificarDto.Hora;
@@ -141,6 +127,34 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             }
 
             context.Update(horarioExistente);
+            await context.SaveChangesAsync();
+
+            return Ok(new { horarioId= horarioExistente.HorarioId, hora= horarioExistente.Hora });
+        }
+        #endregion
+
+        #region Delete
+        [HttpDelete("{horarioId}")]
+        public async Task<ActionResult> EliminarHorario([FromRoute] Guid horarioId)
+        {
+            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
+            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
+            var usuario = await userManager.FindByNameAsync(Username);
+
+
+            var horarioExistente = await context.Horarios.FirstOrDefaultAsync(h => h.HorarioId == horarioId);
+
+            if (horarioExistente == null)
+            {
+                return BadRequest($"El horario con id {horarioId} no existe");
+            }
+
+            if (horarioExistente.UsuarioId != usuario.Id)
+            {
+                return Forbid($"No tienes permisos de modificacion");
+            }
+
+            context.Remove(horarioExistente);
             await context.SaveChangesAsync();
 
             return Ok();
