@@ -45,7 +45,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
         #region Post
         [HttpPost]
-        public async Task<ActionResult> CrearDosificador([FromBody] DosificadorCreacionDto dosificadorCreacionDto)
+        public async Task<ActionResult> CrearDosificador([FromBody] DosificadorEntidadDto dosificadorCreacionDto)
         { 
             var dosificadorExistente = await context.Dosificadores
                 .AnyAsync(d => d.NumeroRegistro.Equals(dosificadorCreacionDto.NumeroRegistro) || d.DosificadorId.Equals(dosificadorCreacionDto.DosificadorId));

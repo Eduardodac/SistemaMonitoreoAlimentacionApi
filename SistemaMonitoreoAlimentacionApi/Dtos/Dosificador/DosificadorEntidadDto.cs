@@ -2,13 +2,12 @@
 
 namespace SistemaMonitoreoAlimentacionApi.Dtos.Dosificador
 {
-    public class DosificadorCreacionDto
+    public class DosificadorEntidadDto
     {
         public Guid DosificadorId { get; set; } = Guid.Empty!;
         public DateTime? FechaSalida { get; set; }
-        [Required]
+        public DateTime? FechaActivacion { get; set; }
         public string NumeroRegistro { get; set; } = null!;
-        [Required]
         public Boolean EstatusActivacion { get; set; } = false;
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SistemaMonitoreoAlimentacionApi.Dtos.Cuentas;
 using SistemaMonitoreoAlimentacionApi.Dtos.Gato;
@@ -143,7 +144,11 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         {
             var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
             var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
-            var usuario = await userManager.FindByNameAsync(Username);
+            //var usuario = await userManager.FindByNameAsync(Username);
+            var usuario = await context.Users
+                .Include(u => u.Dosificador)
+                .Where(u => u.UserName == Username)
+                .FirstOrDefaultAsync();
 
             var userDto = mapper.Map<GetUsuario>(usuario);
 
@@ -215,6 +220,100 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
                 return BadRequest(result.Errors);
             }
         }
+        #endregion
+
+        #region Dosificador
+        [HttpPut("activarDosificador")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult> ActivarCollar([FromBody] ModificarDosificador modificarDosificador)
+        {
+            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
+            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
+            var usuario = await userManager.FindByNameAsync(Username);
+
+            var dosificadorExistente = await context.Dosificadores.FirstOrDefaultAsync(c => c.NumeroRegistro.Equals(modificarDosificador.NumeroRegistro));
+            if (dosificadorExistente == null)
+            {
+                return BadRequest($"El collar con número de registro {modificarDosificador.NumeroRegistro} no existe");
+            }
+
+            if (dosificadorExistente.EstatusActivacion)
+            {
+                return BadRequest($"El collar con número de registro {modificarDosificador.NumeroRegistro} ya está activado");
+            }
+
+            if (usuario.Dosificador != null)
+            {
+                return BadRequest($"El usuario ya tiene un dosificador acivado");
+            }
+
+
+            dosificadorExistente.EstatusActivacion = true;
+            dosificadorExistente.FechaActivacion = DateTime.Now;
+            usuario.DosificadorId = dosificadorExistente.DosificadorId;
+
+            context.Update(dosificadorExistente);
+            await context.SaveChangesAsync();
+
+            var result = await userManager.UpdateAsync(usuario);
+            if (result.Succeeded)
+            {
+                return Ok(dosificadorExistente);
+            }
+            else
+            {
+                return BadRequest(result.Errors);
+            }
+        }
+
+        [HttpPut("desactivarDosificador")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult> DesactivarCollar([FromBody] ModificarDosificador modificarDosificador)
+        {
+            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
+            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
+            var usuario = await userManager.FindByNameAsync(Username);
+
+            var dosificadorExistente = await context.Dosificadores.FirstOrDefaultAsync(c => c.NumeroRegistro.Equals(modificarDosificador.NumeroRegistro));
+
+            if (dosificadorExistente == null)
+            {
+                return BadRequest($"El dosificador con número de registro {modificarDosificador.NumeroRegistro} no existe");
+            }
+
+            if (usuario.DosificadorId == Guid.Empty)
+            {
+                return BadRequest($"El usuario no tiene dosificador asignado");
+            }
+
+            if (!dosificadorExistente.EstatusActivacion)
+            {
+                return BadRequest($"El dosificador con número de registro {modificarDosificador.NumeroRegistro} ya está desactivado");
+            }
+
+            if (dosificadorExistente.DosificadorId != usuario.DosificadorId)
+            {
+                return BadRequest($"El dosificador con número de registro {modificarDosificador.NumeroRegistro} no está ligado al usuario");
+            }
+
+            dosificadorExistente.EstatusActivacion = false;
+            dosificadorExistente.FechaActivacion = null;
+            usuario.DosificadorId = null;
+
+            context.Update(dosificadorExistente);
+            await context.SaveChangesAsync();
+
+            var result = await userManager.UpdateAsync(usuario);
+            if (result.Succeeded)
+            {
+                return Ok(dosificadorExistente);
+            }
+            else
+            {
+                return BadRequest(result.Errors);
+            }
+        }
+
         #endregion
 
         private RespuestaAutenticacion ConstruirToken(CredencialesUsuario credencialesUsuario)

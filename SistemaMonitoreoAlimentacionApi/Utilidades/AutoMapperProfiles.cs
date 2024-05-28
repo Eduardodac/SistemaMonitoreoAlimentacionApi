@@ -19,7 +19,6 @@ namespace SistemaMonitoreoAlimentacionApi.Utilidades
             CreateMap<CollarEntidadDto, Collar>();
             CreateMap<Collar, CollarEntidadDto>();
 
-            CreateMap<DosificadorCreacionDto, Dosificador>();
             CreateMap<HorarioEntidadDto, Horario>().ReverseMap();
             CreateMap<NuevoRegistroDto, Registro>();
 
@@ -28,6 +27,9 @@ namespace SistemaMonitoreoAlimentacionApi.Utilidades
 
             CreateMap<Usuario, ModificarUsuario>();
             CreateMap<Usuario, GetUsuario>();
+            CreateMap<GetUsuario, Usuario>();
+            CreateMap<Dosificador, DosificadorEntidadDto>();
+            CreateMap<DosificadorEntidadDto, Dosificador>();
 
         }
     }
