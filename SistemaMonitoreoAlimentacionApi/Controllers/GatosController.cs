@@ -80,7 +80,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             var usuario = await userManager.FindByNameAsync(Username);
 
             var gatoIdExistente = await context.Gatos.AnyAsync(x => x.GatoId == gatoId);
-            var existeMismoGato = await context.Gatos.FirstOrDefaultAsync(x => x.Nombre == gatoEntidad.Nombre);
+            var existeMismoGato = await context.Gatos.FirstOrDefaultAsync(x => x.Nombre == gatoEntidad.Nombre && x.UsuarioId == usuario.Id);
 
             if(gatoIdExistente)
             {

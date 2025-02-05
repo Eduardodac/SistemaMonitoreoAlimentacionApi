@@ -40,6 +40,65 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
             return HorariosDto;
         }
+
+        [HttpGet("{dosificadorId}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<HorarioEntidadDto>>> ListaHorarioPorDosificador([FromRoute] Guid dosificadorId)
+        {
+            //obtener usuario
+            var UserId = await context.Users.Where(u=>u.DosificadorId == dosificadorId).FirstOrDefaultAsync();
+
+            if (UserId == null)
+            {
+                return NotFound($"Este dosificador no está asignado");
+            }
+
+            var horarios = await context.Horarios.Where(h => h.UsuarioId == UserId.Id).ToListAsync();
+            var HorariosDto = mapper.Map<List<Horario>, List<HorarioEntidadDto>>(horarios);
+
+            return HorariosDto;
+        }
+
+        [HttpGet("confirmarDosificacion/{dosificadorId}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ConfirmarDosificacionDto>> SiguientesDosificaciones([FromRoute] Guid dosificadorId)
+        {
+            //obtener usuario
+            var UserId = await context.Users.Where(u => u.DosificadorId == dosificadorId).FirstOrDefaultAsync();
+
+            if (UserId == null)
+            {
+                return NotFound($"Este dosificador no está asignado");
+            }
+
+            var diaDeLaSemana = (int)DateTime.Now.DayOfWeek + 1; //se suma unidad para coincidir ID's
+            var horarios = await context.Horarios.Include(h => h.DiadelaSemana).Where(horario => horario.DiadelaSemana.DiadelaSemanaId == diaDeLaSemana).ToListAsync();
+
+            TimeSpan unMinuto = TimeSpan.FromMinutes(1);//tiempo mínimo de intervalo
+            var ahora = DateTime.Now.AddMinutes(-1);
+            var confirmar = new ConfirmarDosificacionDto();
+            confirmar.dosificar = false;
+
+            var siguienteHorario = horarios.Where(hora => hora.Hora.TimeOfDay.CompareTo(ahora.TimeOfDay) >= 0).FirstOrDefault();
+
+
+            if (siguienteHorario == null)
+            {
+                confirmar.dosificar = false;
+                return confirmar;
+            }
+
+            var minutosRestantes = Math.Abs((siguienteHorario.Hora.TimeOfDay - ahora.AddMinutes(1).TimeOfDay).TotalMinutes);
+
+            if (minutosRestantes < 1)
+            {
+                confirmar.dosificar = true;
+            }
+
+
+            return confirmar;
+        }
+
         #endregion
 
         #region Post
