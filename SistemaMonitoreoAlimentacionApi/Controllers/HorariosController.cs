@@ -61,26 +61,29 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
         [HttpGet("confirmarDosificacion/{dosificadorId}")]
         [AllowAnonymous]
-        public async Task<ActionResult<ConfirmarDosificacionDto>> SiguientesDosificaciones([FromRoute] Guid dosificadorId)
+        public async Task<ActionResult<ConfirmarDosificacionDto>> confirmarDosificacion([FromRoute] Guid dosificadorId)
         {
             //obtener usuario
             var UserId = await context.Users.Where(u => u.DosificadorId == dosificadorId).FirstOrDefaultAsync();
+            
+            TimeSpan unMinuto = TimeSpan.FromMinutes(1);//tiempo mínimo de intervalo
+            var ahora = DateTime.Now.AddMinutes(-1);
+            
+            var confirmar = new ConfirmarDosificacionDto();
+            confirmar.dosificar = false;
+            confirmar.habilitado = false;
+            confirmar.Hora = ahora.AddMinutes(1);
 
             if (UserId == null)
             {
-                return NotFound($"Este dosificador no está asignado");
+                return confirmar;
             }
 
+            confirmar.habilitado = true;
             var diaDeLaSemana = (int)DateTime.Now.DayOfWeek + 1; //se suma unidad para coincidir ID's
             var horarios = await context.Horarios.Include(h => h.DiadelaSemana).Where(horario => horario.DiadelaSemana.DiadelaSemanaId == diaDeLaSemana).ToListAsync();
 
-            TimeSpan unMinuto = TimeSpan.FromMinutes(1);//tiempo mínimo de intervalo
-            var ahora = DateTime.Now.AddMinutes(-1);
-            var confirmar = new ConfirmarDosificacionDto();
-            confirmar.dosificar = false;
-
             var siguienteHorario = horarios.Where(hora => hora.Hora.TimeOfDay.CompareTo(ahora.TimeOfDay) >= 0).FirstOrDefault();
-
 
             if (siguienteHorario == null)
             {
@@ -94,7 +97,6 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             {
                 confirmar.dosificar = true;
             }
-
 
             return confirmar;
         }
