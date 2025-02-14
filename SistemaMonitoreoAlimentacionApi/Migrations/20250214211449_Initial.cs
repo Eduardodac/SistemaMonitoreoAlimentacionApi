@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SistemaMonitoreoAlimentacionApi.Migrations
 {
-    public partial class initial : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -56,7 +56,7 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 columns: table => new
                 {
                     DosificadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FechaSalida = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    FechaSalida = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FechaActivacion = table.Column<DateTime>(type: "datetime2", nullable: true),
                     NumeroRegistro = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EstatusActivacion = table.Column<bool>(type: "bit", nullable: false)
@@ -92,6 +92,9 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApellidoPaterno = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApellidoMaterno = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ImagenUsuario = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DosificadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -126,7 +129,7 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     RegistroId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DosificadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CollarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Duracion = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Duracion = table.Column<double>(type: "float", nullable: false),
                     Consumo = table.Column<double>(type: "float", nullable: false),
                     Hora = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IntegradoAAnalisis = table.Column<bool>(type: "bit", nullable: false)
@@ -316,11 +319,9 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 {
                     ActividadFelinaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     GatoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FechaInicio = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    FechaFin = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Aproximaciones = table.Column<int>(type: "int", nullable: false),
-                    AlimentoConsumido = table.Column<double>(type: "float", nullable: false),
-                    AproximacionesSinConsumo = table.Column<int>(type: "int", nullable: false)
+                    FechaHora = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Tiempo = table.Column<double>(type: "float", nullable: false),
+                    AlimentoConsumido = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {

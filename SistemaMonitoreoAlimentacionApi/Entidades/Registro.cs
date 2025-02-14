@@ -10,7 +10,7 @@ namespace SistemaMonitoreoAlimentacionApi.Entidades
         [Required]
         public Guid CollarId { get; set; } = Guid.Empty!;
         [Required]
-        public DateTime Duracion { get; set; } = DateTime.Now;
+        public double Duracion { get; set; } = 0.0;
         [Required]
         public double Consumo { get; set; } = 0.0;
         [Required]

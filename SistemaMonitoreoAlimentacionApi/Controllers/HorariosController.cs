@@ -67,7 +67,13 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             var UserId = await context.Users.Where(u => u.DosificadorId == dosificadorId).FirstOrDefaultAsync();
             
             TimeSpan unMinuto = TimeSpan.FromMinutes(1);//tiempo mínimo de intervalo
-            var ahora = DateTime.Now.AddMinutes(-1);
+
+            TimeZoneInfo zonaHoraria = TimeZoneInfo.FindSystemTimeZoneById("America/Mexico_City");
+            DateTime horaUtc = DateTime.UtcNow;
+            DateTime horaLocal = TimeZoneInfo.ConvertTimeFromUtc(horaUtc, zonaHoraria);
+
+
+            var ahora = horaLocal.AddMinutes(-1);
             
             var confirmar = new ConfirmarDosificacionDto();
             confirmar.dosificar = false;
@@ -80,7 +86,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             }
 
             confirmar.habilitado = true;
-            var diaDeLaSemana = (int)DateTime.Now.DayOfWeek + 1; //se suma unidad para coincidir ID's
+            var diaDeLaSemana = (int)DateTime.Now.DayOfWeek + 1; // se suma para que el id coincida
             var horarios = await context.Horarios.Include(h => h.DiadelaSemana).Where(horario => horario.DiadelaSemana.DiadelaSemanaId == diaDeLaSemana).ToListAsync();
 
             var siguienteHorario = horarios.Where(hora => hora.Hora.TimeOfDay.CompareTo(ahora.TimeOfDay) >= 0).FirstOrDefault();
@@ -93,7 +99,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
             var minutosRestantes = Math.Abs((siguienteHorario.Hora.TimeOfDay - ahora.AddMinutes(1).TimeOfDay).TotalMinutes);
 
-            if (minutosRestantes < 1)
+            if (minutosRestantes < .5)
             {
                 confirmar.dosificar = true;
             }
@@ -153,7 +159,6 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
             var usuario = await userManager.FindByNameAsync(Username);
 
-
             var horarioExistente = await context.Horarios.FirstOrDefaultAsync(h => h.HorarioId == horarioId);
 
             if (horarioExistente == null)
@@ -165,7 +170,6 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             {
                 return Forbid($"No tienes permisos de modificacion");
             }
-
 
             if (horarioModificarDto.Hora != null)
             {

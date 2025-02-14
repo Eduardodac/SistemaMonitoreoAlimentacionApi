@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Azure.Storage.Blobs.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
 using SistemaMonitoreoAlimentacionApi.Dtos.Registro;
 using SistemaMonitoreoAlimentacionApi.Entidades;
+using System.ComponentModel.DataAnnotations;
 
 namespace SistemaMonitoreoAlimentacionApi.Controllers
 {
@@ -24,7 +26,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         #region Get
         [HttpGet("{collarId}")]
         public async Task<ActionResult<List<Registro>>> ListaActividadesFelinas([FromRoute] Guid collarId)
-        { 
+        {
             var gatoExistente = await context.Gatos.FirstOrDefaultAsync(g => g.CollarId.Equals(collarId));
 
             if (gatoExistente == null)
@@ -54,10 +56,19 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
                 return NotFound($"Este dosificador con id {nuevoRegistroDto.CollarId} no está asignado");
             }
 
-            var registro = mapper.Map<Registro>(nuevoRegistroDto);
+            var nuevoRegistro = new Registro();
+            nuevoRegistro.RegistroId = Guid.NewGuid();
+            nuevoRegistro.DosificadorId = nuevoRegistroDto.DosificadorId;
+            nuevoRegistro.CollarId = nuevoRegistroDto.CollarId;
+            nuevoRegistro.Duracion = nuevoRegistroDto.Duracion;
+            nuevoRegistro.Consumo = nuevoRegistro.Consumo;
+            nuevoRegistro.Hora = DateTime.Now;
+            nuevoRegistro.IntegradoAAnalisis = false;
 
-            context.Add( registro );
-            await  context.SaveChangesAsync();
+            var registro = mapper.Map<Registro>(nuevoRegistro);
+
+            context.Add(registro);
+            await context.SaveChangesAsync();
 
             return Ok();
         }

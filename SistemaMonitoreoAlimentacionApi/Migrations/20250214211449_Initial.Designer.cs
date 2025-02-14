@@ -12,8 +12,8 @@ using SistemaMonitoreoAlimentacionApi;
 namespace SistemaMonitoreoAlimentacionApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240528043401_modificaDosificador")]
-    partial class modificaDosificador
+    [Migration("20250214211449_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -164,20 +164,14 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     b.Property<double>("AlimentoConsumido")
                         .HasColumnType("float");
 
-                    b.Property<int>("Aproximaciones")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AproximacionesSinConsumo")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("FechaFin")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("FechaInicio")
+                    b.Property<DateTime>("FechaHora")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("GatoId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("Tiempo")
+                        .HasColumnType("float");
 
                     b.HasKey("ActividadFelinaId");
 
@@ -354,8 +348,8 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                     b.Property<Guid>("DosificadorId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Duracion")
-                        .HasColumnType("datetime2");
+                    b.Property<double>("Duracion")
+                        .HasColumnType("float");
 
                     b.Property<DateTime>("Hora")
                         .HasColumnType("datetime2");
