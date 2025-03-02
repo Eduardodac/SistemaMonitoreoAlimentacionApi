@@ -86,7 +86,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             }
 
             confirmar.habilitado = true;
-            var diaDeLaSemana = (int)DateTime.Now.DayOfWeek + 1; // se suma para que el id coincida
+            var diaDeLaSemana = (int)ahora.DayOfWeek + 1; // se suma para que el id coincida
             var horarios = await context.Horarios.Include(h => h.DiadelaSemana).Where(horario => horario.DiadelaSemana.DiadelaSemanaId == diaDeLaSemana).ToListAsync();
 
             var siguienteHorario = horarios.Where(hora => hora.Hora.TimeOfDay.CompareTo(ahora.TimeOfDay) >= 0).FirstOrDefault();

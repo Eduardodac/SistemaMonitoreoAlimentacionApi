@@ -63,33 +63,6 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         }
         #endregion
 
-        #region Disponibilidad
-        [HttpPut("disponibilidad/{dosificadorId}")]
-        [AllowAnonymous]
-        public async Task<ActionResult> DisponibilidadAlimento([FromRoute] Guid dosificadorId, [FromBody] DisponibilidadAvisoDto disponibilidadAvisoDto)
-        {
-            var usuarioExistente = await context.Users.FirstOrDefaultAsync(u => u.DosificadorId == dosificadorId);
-
-            if (usuarioExistente == null)
-            {
-                return BadRequest($"El dosificador con id {dosificadorId} no está asignado");
-            }
-
-            var avisoExistente = await context.Avisos.FirstOrDefaultAsync(a => a.UsuarioId == usuarioExistente.Id);
-            if (avisoExistente == null)
-            {
-                return BadRequest($"El usuario con id {usuarioExistente.Id} no tiene avisos");
-            }
-
-            avisoExistente.AlimentoDisponible = disponibilidadAvisoDto.AlimentoDisponible;
-
-            context.Update(avisoExistente);
-            await context.SaveChangesAsync();
-
-            return Ok();
-        }
-
-        #endregion
 
     }
 }

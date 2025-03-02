@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SistemaMonitoreoAlimentacionApi.Dtos.Aviso;
 using SistemaMonitoreoAlimentacionApi.Dtos.Cuentas;
 using SistemaMonitoreoAlimentacionApi.Dtos.Gato;
 using SistemaMonitoreoAlimentacionApi.Dtos.Usuario;
@@ -73,7 +74,11 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
                 isPersistent: false,
                 lockoutOnFailure: false);
 
-            if(resultado.Succeeded)
+            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
+            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
+            var usuario = await userManager.FindByNameAsync(Username);
+
+            if (resultado.Succeeded)
             {
                 return ConstruirToken(credencialesUsuario);
             }

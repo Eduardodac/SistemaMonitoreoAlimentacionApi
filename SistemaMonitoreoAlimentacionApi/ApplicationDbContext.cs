@@ -25,12 +25,11 @@ namespace SistemaMonitoreoAlimentacionApi
                 .WithOne(c => c.Collar)
                 .HasForeignKey<Gato>(g => g.CollarId);
 
-            modelBuilder.Entity<Usuario>()
-                .HasOne(a => a.Aviso)
-                .WithOne(u => u.Usuario)
-                .HasForeignKey<Aviso>(a => a.AvisoId);
-
-
+            modelBuilder.Entity<Aviso>()
+                .HasOne(a => a.Usuario)
+                .WithOne(u => u.Aviso)
+                .HasForeignKey<Aviso>(a => a.UsuarioId)
+                .HasPrincipalKey<Usuario>(u => u.Id);
         }
 
         public DbSet<Dosificador> Dosificadores { get; set; }

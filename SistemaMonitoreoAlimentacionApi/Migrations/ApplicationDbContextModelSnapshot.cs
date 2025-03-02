@@ -181,6 +181,7 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
             modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Aviso", b =>
                 {
                     b.Property<Guid>("AvisoId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("AlimentoDisponible")
@@ -199,6 +200,9 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("AvisoId");
+
+                    b.HasIndex("UsuarioId")
+                        .IsUnique();
 
                     b.ToTable("Avisos");
                 });
@@ -515,7 +519,7 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 {
                     b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Usuario", "Usuario")
                         .WithOne("Aviso")
-                        .HasForeignKey("SistemaMonitoreoAlimentacionApi.Entidades.Aviso", "AvisoId")
+                        .HasForeignKey("SistemaMonitoreoAlimentacionApi.Entidades.Aviso", "UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

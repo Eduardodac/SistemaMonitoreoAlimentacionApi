@@ -22,8 +22,8 @@ namespace SistemaMonitoreoAlimentacionApi.Utilidades
             CreateMap<HorarioEntidadDto, Horario>().ReverseMap();
             CreateMap<NuevoRegistroDto, Registro>();
 
-            CreateMap<NuevoAvisoDto, Aviso>();
-            CreateMap<ModificarAvisoDto, Aviso>();
+            CreateMap<NuevoAvisoDto, Aviso>().ReverseMap();
+            CreateMap<ModificarAvisoDto, Aviso>().ReverseMap();
 
             CreateMap<Usuario, ModificarUsuario>();
             CreateMap<Usuario, GetUsuario>();

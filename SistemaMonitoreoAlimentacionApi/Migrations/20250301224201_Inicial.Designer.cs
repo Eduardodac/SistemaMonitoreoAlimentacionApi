@@ -12,8 +12,8 @@ using SistemaMonitoreoAlimentacionApi;
 namespace SistemaMonitoreoAlimentacionApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250214211449_Initial")]
-    partial class Initial
+    [Migration("20250301224201_Inicial")]
+    partial class Inicial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -183,6 +183,7 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
             modelBuilder.Entity("SistemaMonitoreoAlimentacionApi.Entidades.Aviso", b =>
                 {
                     b.Property<Guid>("AvisoId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("AlimentoDisponible")
@@ -201,6 +202,9 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("AvisoId");
+
+                    b.HasIndex("UsuarioId")
+                        .IsUnique();
 
                     b.ToTable("Avisos");
                 });
@@ -517,7 +521,7 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 {
                     b.HasOne("SistemaMonitoreoAlimentacionApi.Entidades.Usuario", "Usuario")
                         .WithOne("Aviso")
-                        .HasForeignKey("SistemaMonitoreoAlimentacionApi.Entidades.Aviso", "AvisoId")
+                        .HasForeignKey("SistemaMonitoreoAlimentacionApi.Entidades.Aviso", "UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

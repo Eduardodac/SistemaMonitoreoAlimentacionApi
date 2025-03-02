@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Azure.Storage.Blobs.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +41,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
         #region Post
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult> Registrar([FromBody] NuevoRegistroDto nuevoRegistroDto)
         {
             var gatoAsignado = await context.Gatos.FirstOrDefaultAsync(g => g.CollarId.Equals(nuevoRegistroDto.CollarId));
@@ -56,13 +58,17 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
                 return NotFound($"Este dosificador con id {nuevoRegistroDto.CollarId} no está asignado");
             }
 
+            TimeZoneInfo zonaHoraria = TimeZoneInfo.FindSystemTimeZoneById("America/Mexico_City");
+            DateTime horaUtc = DateTime.UtcNow;
+            DateTime horaLocal = TimeZoneInfo.ConvertTimeFromUtc(horaUtc, zonaHoraria);
+
             var nuevoRegistro = new Registro();
             nuevoRegistro.RegistroId = Guid.NewGuid();
             nuevoRegistro.DosificadorId = nuevoRegistroDto.DosificadorId;
             nuevoRegistro.CollarId = nuevoRegistroDto.CollarId;
             nuevoRegistro.Duracion = nuevoRegistroDto.Duracion;
             nuevoRegistro.Consumo = nuevoRegistro.Consumo;
-            nuevoRegistro.Hora = DateTime.Now;
+            nuevoRegistro.Hora = horaLocal;
             nuevoRegistro.IntegradoAAnalisis = false;
 
             var registro = mapper.Map<Registro>(nuevoRegistro);

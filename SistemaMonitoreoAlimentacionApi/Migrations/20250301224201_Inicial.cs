@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SistemaMonitoreoAlimentacionApi.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Inicial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -251,8 +251,8 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 {
                     table.PrimaryKey("PK_Avisos", x => x.AvisoId);
                     table.ForeignKey(
-                        name: "FK_Avisos_AspNetUsers_AvisoId",
-                        column: x => x.AvisoId,
+                        name: "FK_Avisos_AspNetUsers_UsuarioId",
+                        column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -384,6 +384,12 @@ namespace SistemaMonitoreoAlimentacionApi.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Avisos_UsuarioId",
+                table: "Avisos",
+                column: "UsuarioId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Gatos_CollarId",

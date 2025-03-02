@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaMonitoreoAlimentacionApi.Dtos.Aviso;
+using SistemaMonitoreoAlimentacionApi.Dtos.Gato;
 using SistemaMonitoreoAlimentacionApi.Entidades;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace SistemaMonitoreoAlimentacionApi.Controllers
 {
@@ -28,7 +30,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
         #region Get
         [HttpGet]
-        public async Task<ActionResult<Aviso>> GetAviso() 
+        public async Task<ActionResult<NuevoAvisoDto>> GetAviso() 
         {
             var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
             var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
@@ -38,64 +40,72 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
             if(aviso == null)
             {
-                return NotFound($"Los avisos del usuario con id {usuario.Id} no existen");
-            }
-            return Ok();
-        }
-        #endregion
-        #region Post
-        [HttpPost]
-        public async Task<ActionResult> NuevoAviso([FromBody] NuevoAvisoDto nuevoAvisoDto) 
-        {
-            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
-            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
-            var usuario = await userManager.FindByNameAsync(Username);
+                NuevoAvisoDto nuevoAviso = new NuevoAvisoDto();
+                nuevoAviso.AvisoId = new Guid();
 
-            var avisoExistente = await context.Avisos.AnyAsync(a => a.AvisoId.Equals(nuevoAvisoDto.AvisoId));
-            if (avisoExistente == true) {
-                return BadRequest($"El aviso con id {nuevoAvisoDto.AvisoId} ya existe");
+                nuevoAviso.AlimentoDisponible = 0;
+                nuevoAviso.LimpiarPlato = new DateTime(2000, 1, 1);
+                nuevoAviso.LimpiarContenedor = new DateTime(2000, 1, 1);
+                nuevoAviso.Caducidad = new DateTime(2000, 1, 1);
+
+                var avisoDto = mapper.Map<Aviso>(nuevoAviso);
+                avisoDto.UsuarioId = usuario.Id;
+
+                context.Add(avisoDto);
+                await context.SaveChangesAsync();
+                return mapper.Map<Aviso, NuevoAvisoDto>(avisoDto);
             }
 
-            var aviso = mapper.Map<Aviso>(avisoExistente);
-            aviso.UsuarioId = usuario.Id;
-
-            context.Add(aviso);
-            await context.SaveChangesAsync();
-
-            return Ok();
+            var avisoD = mapper.Map<Aviso, NuevoAvisoDto>(aviso);
+            return avisoD;
+                
         }
         #endregion
+
         #region Put
-        [HttpPut("{avisoId}")]
-        public async Task<ActionResult> NuevoAviso([FromRoute] Guid avisoId,[FromBody] ModificarAvisoDto modificarAvisoDto)
+        [HttpPut]
+        public async Task<ActionResult> NuevoAviso([FromBody] ModificarAvisoDto modificarAvisoDto)
         {
 
             var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
             var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
             var usuario = await userManager.FindByNameAsync(Username);
 
-            var avisoExistente = await context.Avisos.FirstOrDefaultAsync(a => a.AvisoId.Equals(avisoId));
+            var avisoExistente = await context.Avisos.FirstOrDefaultAsync(a => a.UsuarioId.Equals(usuario.Id));
+
             if (avisoExistente == null)
             {
-                return BadRequest($"El aviso con id {avisoId} no existe");
+                NuevoAvisoDto nuevoAviso = new NuevoAvisoDto();
+                nuevoAviso.AvisoId = new Guid();
+                nuevoAviso.AlimentoDisponible = 0;
+                nuevoAviso.LimpiarPlato = modificarAvisoDto.LimpiarPlato;
+                nuevoAviso.LimpiarContenedor = modificarAvisoDto.LimpiarContenedor;
+                nuevoAviso.Caducidad = modificarAvisoDto.Caducidad;
+
+                var avisoDto = mapper.Map<Aviso>(nuevoAviso);
+                avisoDto.UsuarioId = usuario.Id;
+
+                context.Add(avisoDto);
+                await context.SaveChangesAsync();
+                return Ok();
             }
 
-            if(avisoExistente.UsuarioId != usuario.Id)
+            if (avisoExistente.UsuarioId != usuario.Id)
             {
                 return Forbid($"No tienes permisos de modificacion");
             }
 
-            if(modificarAvisoDto.LimpiarPlato != new DateTime(2000, 1, 1))
+            if(modificarAvisoDto.LimpiarPlato.Date != new DateTime(2000, 1, 1).Date)
             {
                 avisoExistente.LimpiarPlato = modificarAvisoDto.LimpiarPlato;
             }
 
-            if (modificarAvisoDto.Caducidad != new DateTime(2000, 1, 1))
+            if (modificarAvisoDto.Caducidad.Date != new DateTime(2000, 1, 1).Date)
             {
                 avisoExistente.Caducidad = modificarAvisoDto.Caducidad;
             }
 
-            if (modificarAvisoDto.LimpiarContenedor != new DateTime(2000, 1, 1))
+            if (modificarAvisoDto.LimpiarContenedor.Date != new DateTime(2000, 1, 1).Date)
             {
                 avisoExistente.LimpiarContenedor = modificarAvisoDto.LimpiarContenedor;
             }
@@ -104,6 +114,58 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             await context.SaveChangesAsync();
 
             return Ok();
+        }
+
+        [HttpPut("modificarAlimentoDisponible/{dosificadorId}")]
+        [AllowAnonymous]
+        public async Task<ActionResult> ModificarAlimentoDisponible([FromRoute] Guid dosificadorId, [FromBody] ModificarAlimentoDisponibleDto modificarAlimentoDisponible)
+        {
+            //obtener usuario
+            var user = await context.Users.Where(u => u.DosificadorId == dosificadorId).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            var avisoExistente = await context.Avisos.FirstOrDefaultAsync(a => a.UsuarioId.Equals(user.Id));
+
+            if (avisoExistente == null)
+            {
+                NuevoAvisoDto nuevoAviso = new NuevoAvisoDto();
+                nuevoAviso.AvisoId = new Guid();
+                nuevoAviso.AlimentoDisponible = 0;
+                nuevoAviso.LimpiarPlato = new DateTime(2000, 1, 1);
+                nuevoAviso.LimpiarContenedor = new DateTime(2000, 1, 1);
+                nuevoAviso.Caducidad = new DateTime(2000, 1, 1);
+
+                var avisoDto = mapper.Map<Aviso>(nuevoAviso);
+                avisoDto.UsuarioId = user.Id;
+
+                context.Add(avisoDto);
+                await context.SaveChangesAsync();
+                return Ok();
+            }
+
+            int porcentaje=10;
+            if (modificarAlimentoDisponible.distancia <= 9.5)
+            {
+                porcentaje = 100;
+            }else if(modificarAlimentoDisponible.distancia > 9.5 && modificarAlimentoDisponible.distancia <= 18.5)
+            {
+                var per = (modificarAlimentoDisponible.distancia - 9.5) * 10;
+                porcentaje = (int)per;
+            }
+            else
+            {
+                porcentaje = 10;
+            }
+
+            avisoExistente.AlimentoDisponible = porcentaje;
+            context.Update(avisoExistente);
+            await context.SaveChangesAsync();
+
+            return Ok();
+
         }
         #endregion
     }
