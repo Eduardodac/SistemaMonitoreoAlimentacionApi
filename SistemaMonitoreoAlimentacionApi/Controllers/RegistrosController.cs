@@ -67,7 +67,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             nuevoRegistro.DosificadorId = nuevoRegistroDto.DosificadorId;
             nuevoRegistro.CollarId = nuevoRegistroDto.CollarId;
             nuevoRegistro.Duracion = nuevoRegistroDto.Duracion;
-            nuevoRegistro.Consumo = nuevoRegistro.Consumo;
+            nuevoRegistro.Consumo = nuevoRegistroDto.Consumo;
             nuevoRegistro.Hora = horaLocal;
             nuevoRegistro.IntegradoAAnalisis = false;
 
