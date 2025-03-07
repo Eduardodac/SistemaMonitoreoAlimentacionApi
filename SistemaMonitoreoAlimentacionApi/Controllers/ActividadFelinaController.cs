@@ -32,35 +32,80 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
         }
 
         #region Get
-        [HttpGet("{gatoId}")]
-        public async Task<ActionResult<List<ActividadFelina>>> ListaActividadesFelinas([FromRoute] Guid gatoId)
+        [HttpGet("{gatoId}/{periodo}")]
+        [HttpGet("{periodo}")]
+        public async Task<IActionResult> GetActividadesFelinas(Guid? gatoId, int periodo)
         {
-            var gatoAsignado = await context.Gatos.FirstOrDefaultAsync(g => g.GatoId.Equals(gatoId));
+            var actividadesQuery = context.ActividadesFelinas.AsQueryable();
 
-            if (gatoAsignado == null)
+            if (gatoId.HasValue)
             {
-                return NotFound($"Este gato con id {gatoId} no existe");
+                actividadesQuery = actividadesQuery.Where(a => a.GatoId == gatoId.Value);
             }
 
-            return await context.ActividadesFelinas.Where(ac => ac.GatoId.Equals(gatoId)).ToListAsync();
-        }
-        #endregion
-        #region Post
-        [HttpPost]
-        public async Task<ActionResult> CrearActividadFelina([FromBody] NuevaActividadFelinaDto nuevaActividadFelinaDto) 
-        {
-            var gatoAsignado = await context.Gatos.FirstOrDefaultAsync(g => g.GatoId.Equals(nuevaActividadFelinaDto.GatoId));
+            var actividades = await actividadesQuery.ToListAsync();
 
-            if (gatoAsignado == null)
+            var gatos = await context.Gatos.ToListAsync();
+
+            var actividadesGato = from act in actividades
+                                  join cat in gatos
+                                  on act.GatoId equals cat.GatoId
+                                  select new
+                                  {
+                                      cat.Nombre,
+                                      act.FechaHora,
+                                      act.Tiempo,
+                                      act.AlimentoConsumido
+                                  };
+
+            var resultado = new List<object>();
+            if (periodo == 1) // 1 día
             {
-                return NotFound($"Este gato con id {nuevaActividadFelinaDto.GatoId} no existe");
+                var actividadesPorHoraYGato = actividadesGato
+                    .GroupBy(a => new
+                    {
+                        Hora = a.FechaHora.Hour,
+                        a.Nombre
+                    })
+                    .Select(g => new
+                    {
+                        name = $"{g.Key.Hora % 12} {(g.Key.Hora < 12 ? "AM" : "PM")}",
+                        g.Key.Nombre, 
+                        AlimentoConsumido = g.Sum(a => a.AlimentoConsumido),
+                        Tiempo = g.Sum(a => a.Tiempo)
+                    })
+                    .OrderBy(g => g.name)
+                    .ToList();
+
+                resultado.AddRange(actividadesPorHoraYGato);
+
+            }
+            else if (periodo == 2) // 1 semana
+            {
+                var actividadesPorDiaYGato = actividadesGato
+                    .GroupBy(a => new
+                    {
+                        Dia = ObtenerDiaEnEspanol(a.FechaHora.DayOfWeek),
+                        a.Nombre 
+                    })
+                    .Select(g => new
+                    {
+                        name = g.Key.Dia.ToString(),
+                        g.Key.Nombre, 
+                        AlimentoConsumido = g.Sum(a => a.AlimentoConsumido),
+                        Tiempo = g.Sum(a => a.Tiempo)
+                    })
+                    .OrderBy(g => g.name)
+                    .ToList();
+
+                resultado.AddRange(actividadesPorDiaYGato);
+            }
+            else
+            {
+                return BadRequest();
             }
 
-            var gato = mapper.Map<ActividadFelina>(nuevaActividadFelinaDto);
-
-            context.Add(gato);
-            await context.SaveChangesAsync();
-            return Ok();
+                return Ok(resultado);
         }
         #endregion
 
@@ -175,5 +220,22 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             return Ok();
         }
         #endregion
+
+        static string ObtenerDiaEnEspanol(DayOfWeek dia)
+        {
+            // Mapeo de DayOfWeek a su equivalente en español
+            Dictionary<DayOfWeek, string> diasEnEspanol = new Dictionary<DayOfWeek, string>
+        {
+            { DayOfWeek.Monday, "Lunes" },
+            { DayOfWeek.Tuesday, "Martes" },
+            { DayOfWeek.Wednesday, "Miércoles" },
+            { DayOfWeek.Thursday, "Jueves" },
+            { DayOfWeek.Friday, "Viernes" },
+            { DayOfWeek.Saturday, "Sábado" },
+            { DayOfWeek.Sunday, "Domingo" }
+        };
+
+            return diasEnEspanol[dia];
+        }
     }
 }

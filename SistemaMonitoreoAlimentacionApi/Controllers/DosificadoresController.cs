@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaMonitoreoAlimentacionApi.Dtos.Aviso;
 using SistemaMonitoreoAlimentacionApi.Dtos.Dosificador;
+using SistemaMonitoreoAlimentacionApi.Dtos.Registro;
 using SistemaMonitoreoAlimentacionApi.Entidades;
 
 namespace SistemaMonitoreoAlimentacionApi.Controllers
@@ -59,6 +60,38 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
 
             context.Add(dosificador);
             await context.SaveChangesAsync();
+            return Ok();
+        }
+        #endregion
+
+        #region Put
+        [HttpPut]
+        public async Task<ActionResult> AuxiliarDosificador([FromBody] DosificadorAuxiliarDto dosificadorAuxiliarDto)
+        {
+            var gatoAsignado = await context.Gatos.FirstOrDefaultAsync(g => g.CollarId.Equals(dosificadorAuxiliarDto.AuxiliarId));
+
+            if (gatoAsignado == null)
+            {
+                return NotFound($"Este collar con id {dosificadorAuxiliarDto.AuxiliarId} no está asignado");
+            }
+
+            var usuarioAsignado = await context.Users.FirstOrDefaultAsync(g => g.Id.Equals(gatoAsignado.UsuarioId));
+
+            if (usuarioAsignado == null)
+            {
+                return NotFound($"Este dosificador con id no está asignado");
+            }
+
+            var dosificadorAsignado = await context.Dosificadores.FirstOrDefaultAsync(d => d.DosificadorId.Equals(usuarioAsignado.DosificadorId));
+            if (dosificadorAsignado == null)
+            {
+                return NotFound($"Este dosificador con id no está asignado");
+            }
+            dosificadorAsignado.AuxiliarId = dosificadorAuxiliarDto.AuxiliarId;
+
+            context.Update(dosificadorAsignado);
+            await context.SaveChangesAsync();
+
             return Ok();
         }
         #endregion

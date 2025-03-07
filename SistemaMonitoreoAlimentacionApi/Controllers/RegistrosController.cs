@@ -58,6 +58,13 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
                 return NotFound($"Este dosificador con id {nuevoRegistroDto.CollarId} no está asignado");
             }
 
+            var DosificadorAsignado = await context.Dosificadores.FirstOrDefaultAsync(g => g.DosificadorId.Equals(nuevoRegistroDto.DosificadorId));
+
+            if (DosificadorAsignado == null)
+            {
+                return NotFound($"Este dosificador con id {nuevoRegistroDto.DosificadorId} no está asignado");
+            }
+
             TimeZoneInfo zonaHoraria = TimeZoneInfo.FindSystemTimeZoneById("America/Mexico_City");
             DateTime horaUtc = DateTime.UtcNow;
             DateTime horaLocal = TimeZoneInfo.ConvertTimeFromUtc(horaUtc, zonaHoraria);
@@ -65,7 +72,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             var nuevoRegistro = new Registro();
             nuevoRegistro.RegistroId = Guid.NewGuid();
             nuevoRegistro.DosificadorId = nuevoRegistroDto.DosificadorId;
-            nuevoRegistro.CollarId = nuevoRegistroDto.CollarId;
+            nuevoRegistro.CollarId = DosificadorAsignado.AuxiliarId;
             nuevoRegistro.Duracion = nuevoRegistroDto.Duracion;
             nuevoRegistro.Consumo = nuevoRegistroDto.Consumo;
             nuevoRegistro.Hora = horaLocal;

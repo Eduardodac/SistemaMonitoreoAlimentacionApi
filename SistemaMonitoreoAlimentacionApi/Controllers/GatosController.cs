@@ -53,6 +53,27 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
             return gatosDto;
         }
 
+        [HttpGet("comboBox")]
+        public async Task<ActionResult<List<GatoBoxEntidadDto>>> GetGatosBox()
+        {
+            var UsernamelClaim = HttpContext.User.Claims.Where(claim => claim.Type == "username").FirstOrDefault();
+            var Username = UsernamelClaim != null ? UsernamelClaim.Value : "";
+            var usuario = await userManager.FindByNameAsync(Username);
+
+            var gatos = await context.Gatos
+                .Include(g => g.Collar)
+                .Where(h => h.UsuarioId == usuario.Id && h.CollarId.HasValue)
+                .ToListAsync();
+
+            var gatosDto = gatos.Select(g => new GatoBoxEntidadDto
+            {
+                Name = g.Nombre,
+                Code = g.GatoId
+            }).ToList();
+
+            return gatosDto;
+        }
+
         [HttpGet("{gatoId}")]
         public async Task<ActionResult<Gato>> GetGato([FromRoute]Guid gatoId)
         {
