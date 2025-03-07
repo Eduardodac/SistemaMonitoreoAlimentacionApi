@@ -141,7 +141,7 @@ namespace SistemaMonitoreoAlimentacionApi.Controllers
                 gatoExistente.Sexo = modificarGatoDto.Sexo;
             }
 
-            if (modificarGatoDto.Edad != null && modificarGatoDto.Edad < 0)
+            if (modificarGatoDto.Edad != null && modificarGatoDto.Edad > 0)
             {
                 gatoExistente.Edad = modificarGatoDto.Edad;
             }
